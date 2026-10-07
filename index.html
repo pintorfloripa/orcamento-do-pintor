@@ -311,6 +311,16 @@
   .selo { display: inline-block; font-size: .8rem; font-weight: 700; padding: 2px 8px; border-radius: 99px; background: var(--warn-soft); color: var(--warn); }
   pre.lista { white-space: pre-wrap; word-break: break-word; margin: 0; font-family: var(--body); font-size: .95rem; line-height: 1.5; background: var(--bg); border-radius: 12px; padding: 14px; user-select: text; }
 
+  .instalar-card { display: flex; flex-direction: column; gap: 10px; background: var(--surface); border: 2px dashed var(--accent); border-radius: 16px; padding: 16px 18px; }
+  .instalar-card b { font-size: 1.1rem; }
+  .instalar-card p { margin: 0; color: var(--muted); }
+  #painelInstalar { position: fixed; inset: 0; z-index: 25; background: rgba(5, 12, 15, .6); display: flex; align-items: flex-end; justify-content: center; padding: 16px 16px calc(16px + env(safe-area-inset-bottom, 0px)); }
+  .painel { background: var(--surface); color: var(--ink); border-radius: 18px; padding: 20px; width: 100%; max-width: 30rem; max-height: 100%; overflow: auto; display: flex; flex-direction: column; gap: 14px; }
+  .painel h2 { font-size: 1.35rem; }
+  .painel ol { margin: 0; padding-left: 1.3em; display: flex; flex-direction: column; gap: 8px; }
+  .painel .sistema { display: flex; flex-direction: column; gap: 8px; padding: 12px 14px; background: var(--bg); border-radius: 12px; }
+  .painel .sistema b { font-size: 1.05rem; }
+
   @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
 </style>
 <!-- Contador de visitas (GoatCounter): conta acessos sem guardar dados pessoais -->
@@ -327,6 +337,7 @@
     </div>
     <div class="header-botoes">
       <button type="button" class="btn-sec" id="btnInicio" hidden>Início</button>
+      <button type="button" class="btn-sec" id="btnInstalarTopo" hidden>Instalar</button>
       <button type="button" class="btn-letra" id="btnLetra" aria-pressed="false">A+ Letra grande</button>
     </div>
   </header>
@@ -347,6 +358,11 @@
         <span>Faça orçamentos em um minuto, controle suas obras, pagamentos e fotos.</span>
         <span class="seta">Abrir ferramentas →</span>
       </button>
+    </div>
+    <div class="instalar-card" id="cardInstalar" hidden>
+      <b>Instale no seu celular</b>
+      <p>Fica com um ícone na tela, abre como um aplicativo e funciona até sem internet. Não ocupa quase nada de espaço.</p>
+      <button type="button" class="btn-principal" id="btnInstalar">Instalar no celular</button>
     </div>
   </div>
 
@@ -584,6 +600,30 @@
   <div class="visor-botoes">
     <button type="button" id="visorFechar">Fechar</button>
     <button type="button" id="visorApagar" hidden>Apagar esta foto</button>
+  </div>
+</div>
+
+<div id="painelInstalar" hidden role="dialog" aria-modal="true" aria-labelledby="tituloInstalar">
+  <div class="painel">
+    <h2 id="tituloInstalar">Como instalar no celular</h2>
+    <div class="sistema" id="instAndroid">
+      <b>Android (Chrome)</b>
+      <ol>
+        <li>Toque nos <b>três pontinhos ⋮</b> no canto de cima, à direita.</li>
+        <li>Toque em <b>"Instalar app"</b> ou <b>"Adicionar à tela inicial"</b>.</li>
+        <li>Confirme tocando em <b>"Instalar"</b> ou <b>"Adicionar"</b>.</li>
+      </ol>
+    </div>
+    <div class="sistema" id="instIphone">
+      <b>iPhone (Safari)</b>
+      <ol>
+        <li>Toque no botão <b>Compartilhar</b> (o quadrado com uma seta para cima), embaixo da tela.</li>
+        <li>Desça a lista e toque em <b>"Adicionar à Tela de Início"</b>.</li>
+        <li>Toque em <b>"Adicionar"</b>, no canto de cima.</li>
+      </ol>
+    </div>
+    <p class="dica">Depois procure o ícone do rolo de pintura na tela do celular.</p>
+    <button type="button" class="btn-principal" id="fecharInstalar">Entendi</button>
   </div>
 </div>
 
@@ -1477,6 +1517,43 @@
   $('escCasa').addEventListener('click', () => { mostrarTela('casa'); window.scrollTo(0, 0); });
   $('escPintor').addEventListener('click', () => { mostrarTela('pintor'); window.scrollTo(0, 0); });
   $('btnInicio').addEventListener('click', () => { mostrarTela('inicio'); window.scrollTo(0, 0); });
+
+
+  // ---------- instalar no celular ----------
+  const jaInstalado = () => {
+    try { return window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true; } catch (e) { return false; }
+  };
+  const ehIphone = /iphone|ipad|ipod/i.test(navigator.userAgent);
+  let pedidoInstalar = null;
+  window.addEventListener('beforeinstallprompt', e => { e.preventDefault(); pedidoInstalar = e; });
+  window.addEventListener('appinstalled', () => { pedidoInstalar = null; mostrarInstalar(); });
+  function mostrarInstalar() {
+    const mostrar = !jaInstalado();
+    $('cardInstalar').hidden = !mostrar;
+    $('btnInstalarTopo').hidden = !mostrar;
+  }
+  function abrirPainelInstalar() {
+    $('instAndroid').hidden = ehIphone;
+    $('instIphone').hidden = false;
+    if (ehIphone) $('instIphone').parentNode.insertBefore($('instIphone'), $('instAndroid'));
+    $('painelInstalar').hidden = false;
+    $('fecharInstalar').focus();
+  }
+  async function instalar() {
+    if (pedidoInstalar) {
+      const p = pedidoInstalar; pedidoInstalar = null;
+      try { p.prompt(); await p.userChoice; } catch (e) { abrirPainelInstalar(); }
+      mostrarInstalar();
+    } else {
+      abrirPainelInstalar();
+    }
+  }
+  $('btnInstalar').addEventListener('click', instalar);
+  $('btnInstalarTopo').addEventListener('click', instalar);
+  $('fecharInstalar').addEventListener('click', () => { $('painelInstalar').hidden = true; });
+  $('painelInstalar').addEventListener('click', e => { if (e.target === $('painelInstalar')) $('painelInstalar').hidden = true; });
+  document.addEventListener('keydown', e => { if (e.key === 'Escape' && !$('painelInstalar').hidden) $('painelInstalar').hidden = true; });
+  mostrarInstalar();
 
   // ---------- letra grande ----------
   function aplicarLetra(g) {
