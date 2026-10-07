@@ -1,5 +1,5 @@
 // Guarda a app no celular para funcionar sem internet.
-const CACHE = 'orcamento-pintor-v2';
+const CACHE = 'orcamento-pintor-v3';
 const ARQUIVOS = ['./', './index.html', './manifest.webmanifest', './icone-192.png', './icone-512.png'];
 
 self.addEventListener('install', e => {
