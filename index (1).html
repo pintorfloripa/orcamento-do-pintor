@@ -1,0 +1,1588 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Orçamento do Pintor · Calculadora de tinta e orçamento de pintura</title>
+<meta name="description" content="Calculadora de tinta grátis: descubra quantos m² e quantas latas comprar. Para pintores: orçamentos em 1 minuto, controle de obras, pagamentos e fotos.">
+<meta name="theme-color" content="#0f5c6e">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icone-192.png" type="image/png">
+<link rel="apple-touch-icon" href="icone-192.png">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Orçamento do Pintor">
+<meta property="og:description" content="Calcule a tinta, monte orçamentos e organize suas obras. Grátis e sem cadastro.">
+<meta property="og:image" content="https://pintorfloripa.github.io/orcamento-do-pintor/og-imagem.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:url" content="https://pintorfloripa.github.io/orcamento-do-pintor/">
+<meta property="og:locale" content="pt_BR">
+<meta property="og:site_name" content="Orçamento do Pintor">
+<link rel="canonical" href="https://pintorfloripa.github.io/orcamento-do-pintor/">
+<meta name="twitter:card" content="summary_large_image">
+<style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=Barlow:wght@400;500;600&display=swap">
+<style>
+  /* Layout: uma coluna no celular, passos numerados, barra fixa embaixo com o total.
+     Tamanhos em rem para o botão "Letra grande" aumentar tudo de uma vez. */
+  :root {
+    --bg: #eef2f3;
+    --surface: #ffffff;
+    --field: #f7f9fa;
+    --ink: #14232b;
+    --muted: #46565e;
+    --line: #c5d1d6;
+    --accent: #0f5c6e;
+    --accent-ink: #ffffff;
+    --accent-soft: #dcebef;
+    --tape: #f2c14e;
+    --tape-ink: #3a2a00;
+    --wa: #17784a;
+    --wa-ink: #ffffff;
+    --danger: #a3312a;
+    --danger-ink: #ffffff;
+    --ok: #1f7a4d; --ok-soft: #dcefe4; --warn: #8f5400; --warn-soft: #fbecd0;
+    --display: "Barlow Condensed", "Arial Narrow", "Roboto Condensed", sans-serif;
+    --body: "Barlow", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #0e171b; --surface: #16232a; --field: #0f1b20; --ink: #eef4f6; --muted: #a9bac1; --line: #33464f;
+      --accent: #5fb4c7; --accent-ink: #06222a; --accent-soft: #1d3540;
+      --tape: #e0b445; --tape-ink: #2a1f00; --wa: #3cbf7c; --wa-ink: #04220f; --danger: #ef7d74; --danger-ink: #2a0c09;
+      --ok: #5fd394; --ok-soft: #163a28; --warn: #f0b35a; --warn-soft: #3a2a10;
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #0e171b; --surface: #16232a; --field: #0f1b20; --ink: #eef4f6; --muted: #a9bac1; --line: #33464f;
+    --accent: #5fb4c7; --accent-ink: #06222a; --accent-soft: #1d3540;
+    --tape: #e0b445; --tape-ink: #2a1f00; --wa: #3cbf7c; --wa-ink: #04220f; --danger: #ef7d74; --danger-ink: #2a0c09;
+    --ok: #5fd394; --ok-soft: #163a28; --warn: #f0b35a; --warn-soft: #3a2a10;
+    color-scheme: dark;
+  }
+
+  html { font-size: 18px; }
+  html.grande { font-size: 21px; }
+  * { box-sizing: border-box; }
+  body {
+    background: var(--bg); color: var(--ink);
+    font-family: var(--body); font-size: 1rem; line-height: 1.5;
+    padding-inline: 16px; padding-block: 20px 140px;
+  }
+  .wrap { max-width: 660px; margin: 0 auto; display: flex; flex-direction: column; gap: 1.1rem; }
+
+  header { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 12px; }
+  .marca { display: flex; flex-direction: column; gap: 10px; align-items: flex-start; min-width: 0; }
+  .fita {
+    font-family: var(--display); font-weight: 700; font-size: 1.7rem; letter-spacing: .02em; line-height: 1;
+    background: var(--tape); color: var(--tape-ink);
+    padding: 8px 18px 6px; transform: rotate(-1.2deg);
+    clip-path: polygon(1.5% 0, 98% 4%, 100% 50%, 98.5% 100%, 1% 96%, 0 50%);
+  }
+  .marca p { margin: 0; color: var(--muted); font-size: .95rem; }
+  .btn-letra { background: var(--surface); border: 2px solid var(--ink); color: var(--ink); font-weight: 700; padding: .55rem 1rem; }
+  .btn-letra[aria-pressed="true"] { background: var(--ink); color: var(--surface); }
+
+  .aviso {
+    display: flex; gap: 10px; align-items: center; flex-wrap: wrap;
+    background: var(--accent-soft); border-radius: 12px; padding: 12px 16px; font-size: .95rem;
+  }
+  .aviso span { flex: 1; min-width: 12rem; }
+
+  section, details.sec-config { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 18px; display: flex; flex-direction: column; gap: 14px; }
+  h2 { font-family: var(--display); font-weight: 700; font-size: 1.4rem; letter-spacing: .03em; text-transform: uppercase; margin: 0; text-wrap: balance; display: flex; align-items: center; gap: .5em; }
+  h2 .n {
+    flex: none; display: inline-flex; align-items: center; justify-content: center;
+    width: 1.7em; height: 1.7em; border-radius: 50%; background: var(--accent); color: var(--accent-ink); font-size: .85em;
+  }
+  .dica { color: var(--muted); font-size: .9rem; margin: 0; }
+  .pergunta { font-weight: 700; margin: 0; }
+
+  label { display: flex; flex-direction: column; gap: 6px; font-size: .95rem; font-weight: 600; color: var(--ink); min-width: 0; }
+  input, select, textarea {
+    font: inherit; font-size: 1rem; font-weight: 500; color: var(--ink); background: var(--field);
+    border: 2px solid var(--line); border-radius: 10px; padding: .6rem .75rem; min-height: 3rem; width: 100%; min-width: 0;
+  }
+  input:focus, select:focus, textarea:focus { border-color: var(--accent); }
+  textarea { resize: vertical; min-height: 4.5rem; }
+  input:focus-visible, select:focus-visible, textarea:focus-visible, button:focus-visible, a:focus-visible, summary:focus-visible {
+    outline: 3px solid var(--accent); outline-offset: 2px;
+  }
+  ::placeholder { color: var(--muted); opacity: .8; }
+  .grade { display: grid; grid-template-columns: repeat(auto-fit, minmax(9.5rem, 1fr)); gap: 12px; }
+  .num { font-variant-numeric: tabular-nums; }
+
+  .modos { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; background: var(--bg); padding: 5px; border-radius: 12px; }
+  .modos input { position: absolute; opacity: 0; pointer-events: none; }
+  .modos label {
+    flex-direction: row; justify-content: center; align-items: center; text-align: center; cursor: pointer;
+    font-size: 1rem; font-weight: 700; padding: .5rem .25rem; min-height: 3.1rem; border-radius: 9px; line-height: 1.2;
+  }
+  .modos input:checked + label { background: var(--accent); color: var(--accent-ink); }
+  .modos input:focus-visible + label { outline: 3px solid var(--accent); outline-offset: 2px; }
+
+  .item { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; padding-block: 14px; border-top: 2px dashed var(--line); }
+  .item:first-child { border-top: none; padding-top: 0; }
+  .item .largo { grid-column: 1 / -1; }
+  .item .linha-total { grid-column: 1 / -1; display: flex; justify-content: space-between; align-items: center; gap: 10px; }
+  .item .linha-total strong { font-size: 1.15rem; }
+  @media (min-width: 620px) { .item { grid-template-columns: 2fr 1.4fr 1fr 1fr; } }
+
+  button { font: inherit; cursor: pointer; border-radius: 10px; min-height: 3rem; }
+  .btn-sec { background: var(--surface); border: 2px solid var(--line); color: var(--ink); padding: .55rem 1rem; font-weight: 700; }
+  .btn-sec:hover { border-color: var(--accent); }
+  .btn-tirar { background: var(--surface); border: 2px solid var(--line); color: var(--danger); font-size: .95rem; font-weight: 700; padding: .4rem .9rem; min-height: 2.75rem; }
+  .btn-add {
+    width: 100%; background: var(--accent-soft); border: 2px dashed var(--accent); color: var(--ink);
+    padding: .7rem 1rem; font-weight: 700; font-size: 1.05rem; text-align: center;
+  }
+  .btn-principal { width: 100%; background: var(--accent); color: var(--accent-ink); border: none; padding: .8rem 1rem; font-weight: 700; font-size: 1.05rem; }
+
+  .check { flex-direction: row; align-items: center; gap: 12px; font-size: 1.05rem; cursor: pointer; min-height: 3rem; }
+  .check input { width: 1.6rem; height: 1.6rem; min-height: 0; accent-color: var(--accent); flex: none; }
+
+  .calc {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(8rem, 1fr)); gap: 12px;
+    background: var(--bg); border-radius: 12px; padding: 14px;
+  }
+  .calc div { display: flex; flex-direction: column; gap: 2px; }
+  .calc small { font-size: .8rem; color: var(--muted); text-transform: uppercase; letter-spacing: .05em; font-weight: 700; }
+  .calc b { font-family: var(--display); font-size: 1.45rem; font-weight: 700; font-variant-numeric: tabular-nums; }
+
+  #listaExtras { display: flex; flex-direction: column; gap: 12px; }
+  .extra { display: grid; grid-template-columns: 1fr 7.5rem; gap: 10px; align-items: end; padding-bottom: 12px; border-bottom: 2px dashed var(--line); }
+  .extra .btn-tirar { grid-column: 1 / -1; justify-self: start; }
+
+  details > summary { cursor: pointer; list-style: none; }
+  details > summary::-webkit-details-marker { display: none; }
+  .sec-config > summary { font-family: var(--display); font-weight: 700; font-size: 1.3rem; letter-spacing: .03em; text-transform: uppercase; min-height: 2.5rem; display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+  .sec-config > summary::after, .mais > summary::after { content: "▾"; font-size: 1.2em; transition: transform .2s; }
+  .sec-config[open] > summary::after, .mais[open] > summary::after { transform: rotate(180deg); }
+  .sec-config > div, .mais > div { display: flex; flex-direction: column; gap: 14px; }
+  .sec-config:not([open]) { gap: 0; }
+  .mais { border: 2px solid var(--line); border-radius: 12px; padding: 4px 14px; }
+  .mais > summary { font-weight: 700; color: var(--accent); min-height: 3rem; display: flex; align-items: center; justify-content: space-between; }
+  .mais[open] { padding-bottom: 14px; }
+
+  .resumo-linhas { display: flex; flex-direction: column; gap: 6px; }
+  .linha { display: flex; justify-content: space-between; gap: 12px; font-variant-numeric: tabular-nums; font-size: 1.05rem; }
+  .linha span:first-child { color: var(--muted); }
+  .linha.total { border-top: 3px solid var(--ink); padding-top: 10px; font-family: var(--display); font-size: 2rem; font-weight: 700; }
+  .linha.total span:first-child { color: var(--ink); }
+
+  pre#mensagem {
+    white-space: pre-wrap; word-break: break-word; margin: 0;
+    font-family: var(--body); font-size: .95rem; line-height: 1.5;
+    background: var(--bg); border-radius: 12px; padding: 14px; max-height: 22rem; overflow: auto;
+    user-select: text;
+  }
+  .acoes { display: flex; gap: 10px; flex-wrap: wrap; }
+  .btn-wa {
+    display: inline-flex; align-items: center; justify-content: center; gap: 8px; text-align: center;
+    background: var(--wa); color: var(--wa-ink); text-decoration: none; font-weight: 700; font-size: 1.05rem;
+    padding: .8rem 1rem; min-height: 3.3rem; border-radius: 12px; flex: 1 1 12rem;
+  }
+  .btn-copiar { flex: 1 1 9rem; padding: .8rem 1rem; min-height: 3.3rem; background: var(--surface); border: 2px solid var(--line); color: var(--ink); font-weight: 700; font-size: 1.05rem; border-radius: 12px; }
+
+  .barra {
+    position: fixed; left: 0; right: 0; bottom: 0; z-index: 5;
+    background: var(--surface); border-top: 2px solid var(--line);
+    padding: 10px 16px calc(10px + env(safe-area-inset-bottom, 0px));
+  }
+  .barra .dentro { max-width: 660px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+  .barra small { display: block; color: var(--muted); font-size: .8rem; text-transform: uppercase; letter-spacing: .06em; font-weight: 700; }
+  .barra b { font-family: var(--display); font-size: 1.8rem; font-weight: 700; font-variant-numeric: tabular-nums; }
+  .barra a { background: var(--accent); color: var(--accent-ink); text-decoration: none; font-weight: 700; font-size: 1.05rem; padding: .7rem 1.2rem; min-height: 3rem; display: inline-flex; align-items: center; border-radius: 12px; white-space: nowrap; }
+
+  .abas { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; background: var(--surface); border: 1px solid var(--line); padding: 5px; border-radius: 14px; position: sticky; top: env(safe-area-inset-top, 0px); z-index: 4; }
+  .abas button { border: none; background: transparent; color: var(--ink); padding: .5rem .2rem; min-height: 3.1rem; font-family: var(--display); font-weight: 700; font-size: 1.1rem; letter-spacing: .02em; text-transform: uppercase; min-width: 0; }
+  .abas button[aria-selected="true"] { background: var(--accent); color: var(--accent-ink); }
+  #telaOrc, #telaObras, #telaPort { display: flex; flex-direction: column; gap: 1.1rem; }
+  .linha-topo { display: flex; justify-content: flex-end; }
+
+  .confirma { display: flex; flex-direction: column; gap: 12px; padding: 14px 16px; border: 3px solid var(--danger); border-radius: 12px; background: var(--surface); color: var(--ink); width: 100%; }
+  .confirma p { margin: 0; font-weight: 700; font-size: 1.05rem; }
+  .confirma .sim { background: var(--danger); color: var(--danger-ink); border: none; font-weight: 700; padding: .6rem 1.1rem; flex: 1 1 9rem; }
+  .confirma .nao { flex: 1 1 9rem; }
+
+  .stats { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .stat { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 12px 14px; display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+  .stat small { font-size: .8rem; color: var(--muted); text-transform: uppercase; letter-spacing: .05em; font-weight: 700; }
+  .stat b { font-family: var(--display); font-size: 1.5rem; font-weight: 700; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+  .stat.destaque { background: var(--tape); color: var(--tape-ink); border-color: transparent; }
+  .stat.destaque small { color: var(--tape-ink); }
+  .topo-obras { display: flex; flex-direction: column; gap: 10px; }
+  #listaObras { display: flex; flex-direction: column; gap: 12px; }
+  .obra { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 16px; }
+  .obra summary { display: flex; flex-direction: column; gap: 8px; }
+  .obra-topo { display: flex; justify-content: space-between; gap: 10px; align-items: center; flex-wrap: wrap; }
+  .obra-topo strong { font-size: 1.15rem; min-width: 0; overflow-wrap: anywhere; }
+  .chip { font-size: .85rem; font-weight: 700; padding: 4px 10px; border-radius: 99px; white-space: nowrap; }
+  .chip.ok { background: var(--ok-soft); color: var(--ok); }
+  .chip.alerta { background: var(--warn-soft); color: var(--warn); }
+  .chip.andamento { background: var(--accent-soft); color: var(--ink); }
+  .obra-sub { color: var(--muted); font-size: .95rem; }
+  .barra-pago { height: 12px; border-radius: 99px; background: var(--bg); overflow: hidden; border: 1px solid var(--line); }
+  .barra-pago i { display: block; height: 100%; background: var(--ok); }
+  .obra-nums { display: flex; justify-content: space-between; gap: 10px; font-size: .95rem; flex-wrap: wrap; }
+  .obra-abrir { color: var(--accent); font-weight: 700; font-size: .95rem; }
+  .obra[open] .obra-abrir { display: none; }
+  .obra-corpo { display: flex; flex-direction: column; gap: 14px; margin-top: 16px; padding-top: 16px; border-top: 2px dashed var(--line); }
+  h3 { margin: 6px 0 0; font-size: 1.1rem; font-weight: 700; }
+  .mov { display: grid; grid-template-columns: 1fr auto auto; gap: 10px; align-items: center; padding-block: 8px; border-bottom: 1px solid var(--line); }
+  .mov-info { display: flex; flex-direction: column; min-width: 0; }
+  .mov-txt { overflow-wrap: anywhere; font-weight: 600; }
+  .mov-data { color: var(--muted); font-size: .85rem; }
+  .form-mov { display: grid; grid-template-columns: repeat(auto-fit, minmax(8.5rem, 1fr)); gap: 10px; align-items: end; background: var(--bg); padding: 12px; border-radius: 12px; }
+  .form-mov input, .form-mov select { background: var(--surface); }
+  .form-mov .largo, .form-mov button { grid-column: 1 / -1; }
+  .obra-resumo { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; background: var(--bg); border-radius: 12px; padding: 12px; }
+  .obra-resumo div { display: flex; flex-direction: column; min-width: 0; }
+  .obra-resumo span { font-size: .8rem; color: var(--muted); font-weight: 600; }
+  .obra-resumo b { font-size: 1.05rem; overflow-wrap: anywhere; }
+  .perigo { color: var(--danger); }
+  .vazio { color: var(--muted); text-align: center; padding: 24px 0; margin: 0; }
+  .erro { border-color: var(--danger) !important; outline: 2px solid var(--danger); }
+  .msg-erro { color: var(--danger); font-weight: 700; font-size: .9rem; grid-column: 1 / -1; margin: 0; }
+
+  .vh { position: absolute; width: 1px; height: 1px; opacity: 0; overflow: hidden; }
+  .botoes-foto { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .btn-foto { cursor: pointer; display: flex; align-items: center; justify-content: center; position: relative; border-radius: 10px; min-height: 3rem; }
+  .btn-foto:focus-within { outline: 3px solid var(--accent); outline-offset: 2px; }
+  .fotos { display: grid; grid-template-columns: repeat(auto-fill, minmax(7rem, 1fr)); gap: 8px; }
+  .foto { position: relative; margin: 0; aspect-ratio: 1; max-width: 100%; border-radius: 10px; overflow: hidden; background: var(--bg); }
+  .foto > button.ver { all: unset; cursor: pointer; display: block; width: 100%; height: 100%; }
+  .foto > button.ver:focus-visible { outline: 3px solid var(--accent); outline-offset: -3px; }
+  .foto img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .foto figcaption { position: absolute; left: 6px; bottom: 6px; font-size: .8rem; font-weight: 700; padding: 2px 8px; border-radius: 99px; background: var(--surface); color: var(--ink); }
+  .foto figcaption.depois { background: var(--ok-soft); color: var(--ok); }
+  .port-lista { display: flex; flex-direction: column; gap: 14px; }
+  .port { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 16px; display: flex; flex-direction: column; gap: 12px; }
+  .port h3 { font-family: var(--display); font-size: 1.3rem; font-weight: 700; margin: 0; letter-spacing: .02em; }
+  .port-par { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .port-col { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+  .port-col > small { font-size: .85rem; text-transform: uppercase; letter-spacing: .06em; font-weight: 700; color: var(--muted); }
+  .port-col .fotos { grid-template-columns: 1fr; }
+  .port-col .foto { aspect-ratio: 4 / 3; }
+
+  /* Visor de foto: fundo sempre escuro, nos dois temas */
+  #visor { position: fixed; inset: 0; z-index: 20; background: rgba(5, 12, 15, .94); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 16px; padding: calc(16px + env(safe-area-inset-top, 0px)) 16px calc(16px + env(safe-area-inset-bottom, 0px)); }
+  #visor img { max-width: 100%; max-height: calc(100% - 9rem); object-fit: contain; border-radius: 8px; }
+  .visor-botoes { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; width: 100%; max-width: 30rem; }
+  .visor-botoes > button { flex: 1 1 9rem; font-weight: 700; font-size: 1.05rem; padding: .6rem 1rem; border: none; }
+  #visorFechar { background: #ffffff; color: #14232b; }
+  #visorApagar { background: #ffffff; color: #a3312a; }
+
+  .header-botoes { display: flex; gap: 8px; flex-wrap: wrap; }
+  #telaInicio, #telaCasa, #telaPintor { display: flex; flex-direction: column; gap: 1.1rem; }
+  .inicio-hero { display: flex; flex-direction: column; gap: 10px; padding-block: 6px; }
+  .inicio-hero h1 { font-family: var(--display); font-weight: 700; font-size: 2.3rem; line-height: 1.05; margin: 0; text-wrap: balance; }
+  .inicio-hero p { margin: 0; font-size: 1.05rem; color: var(--muted); max-width: 34ch; }
+  .escolhas { display: grid; grid-template-columns: 1fr; gap: 12px; }
+  @media (min-width: 620px) { .escolhas { grid-template-columns: 1fr 1fr; } }
+  .escolha {
+    display: flex; flex-direction: column; align-items: flex-start; gap: 6px; text-align: left;
+    padding: 20px; border-radius: 16px; border: none; min-height: 8rem;
+  }
+  .escolha b { font-family: var(--display); font-size: 1.6rem; line-height: 1.1; }
+  .escolha span { font-size: 1rem; line-height: 1.4; }
+  .escolha .seta { margin-top: auto; font-weight: 700; }
+  .escolha.casa { background: var(--tape); color: var(--tape-ink); }
+  .escolha.pintor { background: var(--accent); color: var(--accent-ink); }
+  .escolha:hover { filter: brightness(1.04); }
+  .comodo { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; padding-block: 14px; border-top: 2px dashed var(--line); }
+  .comodo:first-child { border-top: none; padding-top: 0; }
+  .comodo .largo { grid-column: 1 / -1; }
+  .comodo .linha-total { grid-column: 1 / -1; display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; }
+  .comodo .linha-total span { color: var(--muted); font-size: .95rem; }
+  .resultado { display: flex; flex-direction: column; gap: 10px; }
+  .res-linha { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; flex-wrap: wrap; padding-block: 8px; border-bottom: 1px solid var(--line); }
+  .res-linha span { color: var(--muted); }
+  .res-linha b { font-family: var(--display); font-size: 1.45rem; font-variant-numeric: tabular-nums; text-align: right; }
+  .res-linha.destaque b { font-size: 1.8rem; }
+
+  .estimado { display: grid; grid-template-columns: 1fr; gap: 10px; padding-block: 14px; border-top: 2px dashed var(--line); }
+  .estimado:first-child { border-top: none; padding-top: 0; }
+  .estimado .linha-total { display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; }
+  .estimado .linha-total span { color: var(--muted); font-size: .95rem; }
+  .selo { display: inline-block; font-size: .8rem; font-weight: 700; padding: 2px 8px; border-radius: 99px; background: var(--warn-soft); color: var(--warn); }
+  pre.lista { white-space: pre-wrap; word-break: break-word; margin: 0; font-family: var(--body); font-size: .95rem; line-height: 1.5; background: var(--bg); border-radius: 12px; padding: 14px; user-select: text; }
+
+  .instalar-card { display: flex; flex-direction: column; gap: 10px; background: var(--surface); border: 2px dashed var(--accent); border-radius: 16px; padding: 16px 18px; }
+  .instalar-card b { font-size: 1.1rem; }
+  .instalar-card p { margin: 0; color: var(--muted); }
+  #painelInstalar { position: fixed; inset: 0; z-index: 25; background: rgba(5, 12, 15, .6); display: flex; align-items: flex-end; justify-content: center; padding: 16px 16px calc(16px + env(safe-area-inset-bottom, 0px)); }
+  .painel { background: var(--surface); color: var(--ink); border-radius: 18px; padding: 20px; width: 100%; max-width: 30rem; max-height: 100%; overflow: auto; display: flex; flex-direction: column; gap: 14px; }
+  .painel h2 { font-size: 1.35rem; }
+  .painel ol { margin: 0; padding-left: 1.3em; display: flex; flex-direction: column; gap: 8px; }
+  .painel .sistema { display: flex; flex-direction: column; gap: 8px; padding: 12px 14px; background: var(--bg); border-radius: 12px; }
+  .painel .sistema b { font-size: 1.05rem; }
+
+  @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+<!-- Contador de visitas (GoatCounter): conta acessos sem guardar dados pessoais -->
+<script data-goatcounter="https://orcamentodopintor.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
+</head>
+<body>
+
+
+<div class="wrap">
+  <header>
+    <div class="marca">
+      <div class="fita">Orçamento do Pintor</div>
+      <p>Orçamentos, obras e cobranças, tudo num lugar.</p>
+    </div>
+    <div class="header-botoes">
+      <button type="button" class="btn-sec" id="btnInicio" hidden>Início</button>
+      <button type="button" class="btn-sec" id="btnInstalarTopo" hidden>Instalar</button>
+      <button type="button" class="btn-letra" id="btnLetra" aria-pressed="false">A+ Letra grande</button>
+    </div>
+  </header>
+
+  <div id="telaInicio">
+    <div class="inicio-hero">
+      <h1>Vai pintar? Comece por aqui.</h1>
+      <p>Calcule quanta tinta comprar, monte orçamentos e organize suas obras. Grátis e sem cadastro.</p>
+    </div>
+    <div class="escolhas">
+      <button type="button" class="escolha casa" id="escCasa">
+        <b>Vou pintar minha casa</b>
+        <span>Descubra quantos metros quadrados e quantas latas de tinta você precisa.</span>
+        <span class="seta">Calcular a tinta →</span>
+      </button>
+      <button type="button" class="escolha pintor" id="escPintor">
+        <b>Sou pintor</b>
+        <span>Faça orçamentos em um minuto, controle suas obras, pagamentos e fotos.</span>
+        <span class="seta">Abrir ferramentas →</span>
+      </button>
+    </div>
+    <div class="instalar-card" id="cardInstalar" hidden>
+      <b>Instale no seu celular</b>
+      <p>Fica com um ícone na tela, abre como um aplicativo e funciona até sem internet. Não ocupa quase nada de espaço.</p>
+      <button type="button" class="btn-principal" id="btnInstalar">Instalar no celular</button>
+    </div>
+  </div>
+
+  <div id="telaCasa" hidden>
+    <div>
+      <h2>Calculadora de tinta</h2>
+      <p class="dica">Para quem vai pintar a casa ou quer conferir o orçamento de um pintor.</p>
+    </div>
+    <section>
+      <h2><span class="n">1</span>Cômodos</h2>
+      <p class="pergunta">Você sabe as medidas?</p>
+      <div class="modos" role="radiogroup" aria-label="Como informar as medidas">
+        <input type="radio" name="casaModo" id="cmMedir" value="medir"><label for="cmMedir">Vou medir</label>
+        <input type="radio" name="casaModo" id="cmM2" value="m2"><label for="cmM2">Já sei os m²</label>
+        <input type="radio" name="casaModo" id="cmEstimar" value="estimar"><label for="cmEstimar">Não sei</label>
+      </div>
+
+      <div id="blocoMedir">
+        <p class="dica">Meça o chão com uma trena. Se não souber a altura, deixe 2,70 m, que é o comum em apartamentos.</p>
+        <div id="listaComodos"></div>
+        <button class="btn-add" id="addComodo" type="button" style="margin-top:12px">+ Adicionar cômodo</button>
+      </div>
+
+      <div id="blocoM2Casa" hidden>
+        <p class="dica">Use se o pintor, a construtora ou a planta do imóvel já informou a área.</p>
+        <div class="grade">
+          <label for="casaM2Paredes">m² de paredes<input id="casaM2Paredes" class="num" data-c="m2Paredes" inputmode="decimal"></label>
+          <label for="casaM2Teto">m² de teto (se for pintar)<input id="casaM2Teto" class="num" data-c="m2Teto" inputmode="decimal"></label>
+        </div>
+      </div>
+
+      <div id="blocoEstimar" hidden>
+        <p class="dica">Escolha o tamanho parecido de cada cômodo. O cálculo é aproximado, então compre um pouco a mais.</p>
+        <div id="listaEstimados"></div>
+        <button class="btn-add" id="addEstimado" type="button" style="margin-top:12px">+ Adicionar cômodo</button>
+      </div>
+    </section>
+    <section>
+      <h2><span class="n">2</span>Tinta</h2>
+      <div class="grade">
+        <label for="casaDemaos">Quantas demãos<input id="casaDemaos" class="num" data-c="demaos" inputmode="numeric"></label>
+        <label for="casaRend">Rendimento (m² por litro)<input id="casaRend" class="num" data-c="rend" inputmode="decimal"></label>
+      </div>
+      <p class="dica">O rendimento vem escrito na lata. Se não souber, deixe 10. Normalmente são 2 demãos.</p>
+      <details class="mais">
+        <summary>Quer saber o custo da tinta?</summary>
+        <div>
+          <label for="casaLata">Preço da lata de 18 litros (R$)<input id="casaLata" class="num" data-c="lata" inputmode="decimal"></label>
+          <label for="casaGalao">Preço do galão de 3,6 litros (R$)<input id="casaGalao" class="num" data-c="galao" inputmode="decimal"></label>
+        </div>
+      </details>
+    </section>
+    <section>
+      <h2><span class="n">3</span>Resultado</h2>
+      <div class="resultado" aria-live="polite">
+        <div class="res-linha"><span>Área de paredes</span><b id="rcParedes">0 m²</b></div>
+        <div class="res-linha"><span>Área de teto</span><b id="rcTeto">0 m²</b></div>
+        <div class="res-linha destaque"><span>Tinta para paredes</span><b id="rcTintaParede">—</b></div>
+        <div class="res-linha destaque" id="rcTetoLinha"><span>Tinta para teto</span><b id="rcTintaTeto">—</b></div>
+        <div class="res-linha" id="rcCustoLinha" hidden><span>Custo da tinta</span><b id="rcCusto">R$ 0,00</b></div>
+      </div>
+      <p class="dica" id="rcNota">Portas e janelas já foram descontadas. Para o teto, use tinta própria para teto. Na dúvida, compre um pouco a mais.</p>
+    </section>
+    <section>
+      <h2><span class="n">4</span>Lista de compras</h2>
+      <p class="dica">Mande para você mesmo ou para quem vai comprar, e mostre na loja.</p>
+      <pre class="lista" id="listaComprasTxt"></pre>
+      <div class="acoes">
+        <a class="btn-wa" id="btnWaLista" href="#" target="_blank" rel="noopener">Mandar pelo WhatsApp</a>
+        <button class="btn-copiar" id="btnCopiarLista" type="button">Copiar lista</button>
+      </div>
+    </section>
+    <div class="aviso"><span><b>Vai contratar um pintor?</b> Mande esta lista e as medidas para ele fazer o orçamento. Em breve você também vai poder encontrar pintores da sua região aqui.</span></div>
+  </div>
+
+  <div id="telaPintor" hidden>
+  <nav class="abas" role="tablist" aria-label="Seções">
+    <button type="button" role="tab" id="abaOrc" aria-selected="true">Orçamento</button>
+    <button type="button" role="tab" id="abaObras" aria-selected="false">Obras</button>
+    <button type="button" role="tab" id="abaPort" aria-selected="false">Portfólio</button>
+  </nav>
+
+  <div id="telaOrc">
+    <div class="aviso" id="avisoExemplo">
+      <span>Isto é um exemplo para você ver como funciona. Troque pelos seus dados ou toque em "Começar orçamento novo".</span>
+    </div>
+    <div class="linha-topo"><button class="btn-sec" id="btnNovo" type="button">Começar orçamento novo</button></div>
+
+    <details class="sec-config">
+      <summary>Seus dados e preços</summary>
+      <div>
+        <p class="dica">Preencha uma vez só. Fica salvo neste celular e aparece em todos os orçamentos.</p>
+        <div class="grade">
+          <label for="pintorNome">Seu nome<input id="pintorNome" data-k="pintor.nome" autocomplete="name"></label>
+          <label for="pintorTel">Seu WhatsApp<input id="pintorTel" data-k="pintor.tel" inputmode="tel"></label>
+        </div>
+        <p class="pergunta">Quanto você cobra por m²?</p>
+        <div class="grade" id="gradePrecos"></div>
+        <p class="pergunta">Tinta</p>
+        <p class="dica">O rendimento vem escrito na lata. Se não souber, deixe 10.</p>
+        <div class="grade">
+          <label for="rend">Rendimento (m² por litro)<input id="rend" class="num" data-k="tinta.rend" inputmode="decimal"></label>
+          <label for="lata">Preço da lata de 18 litros (R$)<input id="lata" class="num" data-k="tinta.lata" inputmode="decimal"></label>
+          <label for="galao">Preço do galão de 3,6 litros (R$)<input id="galao" class="num" data-k="tinta.galao" inputmode="decimal"></label>
+        </div>
+      </div>
+    </details>
+
+    <section>
+      <h2><span class="n">1</span>Cliente</h2>
+      <label for="cliNome">Nome do cliente<input id="cliNome" data-k="cliente.nome"></label>
+      <label for="cliTel">WhatsApp do cliente<input id="cliTel" data-k="cliente.tel" inputmode="tel" placeholder="(48) 99999-9999"></label>
+      <label for="cliLocal">Onde é a obra<input id="cliLocal" data-k="cliente.local" placeholder="Ex.: apartamento, casa, bairro"></label>
+    </section>
+
+    <section>
+      <h2><span class="n">2</span>Mão de obra</h2>
+      <p class="pergunta">Como você vai cobrar?</p>
+      <div class="modos" role="radiogroup" aria-label="Como você vai cobrar">
+        <input type="radio" name="modo" id="modoM2" value="m2"><label for="modoM2">Por m²</label>
+        <input type="radio" name="modo" id="modoDia" value="dia"><label for="modoDia">Por dia</label>
+        <input type="radio" name="modo" id="modoFechado" value="fechado"><label for="modoFechado">Preço fechado</label>
+      </div>
+
+      <div id="blocoM2">
+        <div id="listaItens"></div>
+        <button class="btn-add" id="addItem" type="button">+ Adicionar serviço</button>
+      </div>
+
+      <div id="blocoDia" hidden>
+        <div class="grade">
+          <label for="dias">Quantos dias<input id="dias" class="num" data-k="dia.dias" inputmode="decimal"></label>
+          <label for="pintores">Quantos pintores<input id="pintores" class="num" data-k="dia.pintores" inputmode="numeric"></label>
+          <label for="diaria">Diária de cada pintor (R$)<input id="diaria" class="num" data-k="dia.valor" inputmode="decimal"></label>
+        </div>
+        <label for="diaDesc">O que vai ser feito<textarea id="diaDesc" data-k="dia.desc"></textarea></label>
+      </div>
+
+      <div id="blocoFechado" hidden>
+        <label for="fechValor">Valor da mão de obra (R$)<input id="fechValor" class="num" data-k="fechado.valor" inputmode="decimal"></label>
+        <label for="fechDesc">O que vai ser feito<textarea id="fechDesc" data-k="fechado.desc"></textarea></label>
+      </div>
+    </section>
+
+    <section>
+      <h2><span class="n">3</span>Material</h2>
+      <label class="check" for="incluir"><input type="checkbox" id="incluir" data-k="material.incluir">Eu compro o material e cobro do cliente</label>
+
+      <label for="areaTinta" id="areaManualLbl">Quantos m² vão ser pintados<input id="areaTinta" class="num" data-k="areaManual" inputmode="decimal"></label>
+      <p class="dica" id="areaAutoDica"></p>
+
+      <div class="calc" aria-live="polite">
+        <div><small>Tinta necessária</small><b id="cLitros">0 L</b></div>
+        <div><small>Comprar</small><b id="cLatas">—</b></div>
+        <div><small>Custo da tinta</small><b id="cCustoTinta">R$ 0,00</b></div>
+      </div>
+
+      <div id="blocoExtras">
+        <p class="pergunta">Outros materiais</p>
+        <p class="dica">Massa, selador, lixa, fita, lona...</p>
+        <div id="listaExtras"></div>
+        <button class="btn-add" id="addExtra" type="button" style="margin-top:12px">+ Adicionar material</button>
+      </div>
+
+      <details class="mais">
+        <summary>Mais opções</summary>
+        <div>
+          <label for="demaos">Quantas demãos de tinta<input id="demaos" class="num" data-k="tinta.demaos" inputmode="numeric"></label>
+        </div>
+      </details>
+    </section>
+
+    <section>
+      <h2><span class="n">4</span>Prazo e pagamento</h2>
+      <label for="prazo">Quantos dias de trabalho<input id="prazo" class="num" data-k="prazo" inputmode="numeric"></label>
+      <label for="pagamento">Como o cliente vai pagar<input id="pagamento" data-k="pagamento" placeholder="Ex.: 50% no início e 50% no final"></label>
+      <details class="mais">
+        <summary>Mais opções</summary>
+        <div>
+          <label for="desconto">Desconto (R$)<input id="desconto" class="num" data-k="desconto" inputmode="decimal"></label>
+          <label for="validade">Orçamento vale por quantos dias<input id="validade" class="num" data-k="validade" inputmode="numeric"></label>
+          <label for="obs">Observações<textarea id="obs" data-k="obs"></textarea></label>
+        </div>
+      </details>
+    </section>
+
+    <section id="enviar">
+      <h2><span class="n">5</span>Enviar ao cliente</h2>
+      <div class="resumo-linhas" id="resumo">
+        <div class="linha"><span>Mão de obra</span><span id="rMao">R$ 0,00</span></div>
+        <div class="linha"><span>Material</span><span id="rMat">R$ 0,00</span></div>
+        <div class="linha" id="rDescLinha"><span>Desconto</span><span id="rDesc">R$ 0,00</span></div>
+        <div class="linha total"><span>Total</span><span id="rTotal">R$ 0,00</span></div>
+      </div>
+      <p class="pergunta">Mensagem que o cliente vai receber:</p>
+      <pre id="mensagem"></pre>
+      <div class="acoes">
+        <a class="btn-wa" id="btnWa" href="#" target="_blank" rel="noopener">Abrir no WhatsApp</a>
+        <button class="btn-copiar" id="btnCopiar" type="button">Copiar mensagem</button>
+      </div>
+      <p class="dica" id="dicaWa">Se o WhatsApp não abrir, toque em "Copiar mensagem" e cole na conversa com o cliente.</p>
+      <button class="btn-principal" id="btnSalvarObra" type="button">O cliente aprovou: salvar como obra</button>
+    </section>
+  </div>
+
+  <div id="telaObras" hidden>
+    <div class="stats">
+      <div class="stat destaque"><small>Falta receber</small><b id="sAReceber">R$ 0,00</b></div>
+      <div class="stat"><small>Recebido no mês</small><b id="sRecMes">R$ 0,00</b></div>
+      <div class="stat"><small>Gastos no mês</small><b id="sGasMes">R$ 0,00</b></div>
+      <div class="stat"><small>Sobrou no mês</small><b id="sSobra">R$ 0,00</b></div>
+    </div>
+    <div class="aviso" id="avisoObrasEx"><span>A obra abaixo é um exemplo. Ela some quando você cria a primeira obra sua.</span></div>
+    <div class="topo-obras">
+      <h2>Minhas obras</h2>
+      <button class="btn-principal" id="btnNovaObra" type="button">+ Nova obra</button>
+    </div>
+    <div id="listaObras"></div>
+  </div>
+
+  <div id="telaPort" hidden>
+    <div>
+      <h2>Portfólio</h2>
+      <p class="dica">Seus trabalhos de antes e depois, para mostrar a clientes novos. Toque numa foto para ver grande. As fotos são colocadas dentro de cada obra.</p>
+    </div>
+    <div class="aviso" id="avisoFotosEx" hidden><span>As fotos abaixo são desenhos de exemplo. Elas somem quando você cria a primeira obra sua.</span></div>
+    <div class="aviso" id="avisoSemDB" hidden><span>Este navegador não deixa guardar fotos: elas somem ao fechar a página. Guarde sempre as originais na galeria do celular.</span></div>
+    <div class="port-lista" id="listaPort"></div>
+  </div>
+  </div>
+</div>
+
+<div id="visor" hidden role="dialog" aria-modal="true" aria-label="Foto ampliada">
+  <img id="visorImg" alt="">
+  <div class="visor-botoes">
+    <button type="button" id="visorFechar">Fechar</button>
+    <button type="button" id="visorApagar" hidden>Apagar esta foto</button>
+  </div>
+</div>
+
+<div id="painelInstalar" hidden role="dialog" aria-modal="true" aria-labelledby="tituloInstalar">
+  <div class="painel">
+    <h2 id="tituloInstalar">Como instalar no celular</h2>
+    <div class="sistema" id="instAndroid">
+      <b>Android (Chrome)</b>
+      <ol>
+        <li>Toque nos <b>três pontinhos ⋮</b> no canto de cima, à direita.</li>
+        <li>Toque em <b>"Instalar app"</b> ou <b>"Adicionar à tela inicial"</b>.</li>
+        <li>Confirme tocando em <b>"Instalar"</b> ou <b>"Adicionar"</b>.</li>
+      </ol>
+    </div>
+    <div class="sistema" id="instIphone">
+      <b>iPhone (Safari)</b>
+      <ol>
+        <li>Toque no botão <b>Compartilhar</b> (o quadrado com uma seta para cima), embaixo da tela.</li>
+        <li>Desça a lista e toque em <b>"Adicionar à Tela de Início"</b>.</li>
+        <li>Toque em <b>"Adicionar"</b>, no canto de cima.</li>
+      </ol>
+    </div>
+    <p class="dica">Depois procure o ícone do rolo de pintura na tela do celular.</p>
+    <button type="button" class="btn-principal" id="fecharInstalar">Entendi</button>
+  </div>
+</div>
+
+<div class="barra" id="barraTotalBox">
+  <div class="dentro">
+    <div><small>Total do orçamento</small><b id="barraTotal">R$ 0,00</b></div>
+    <a href="#enviar">Enviar</a>
+  </div>
+</div>
+
+<script>
+(function () {
+  const CHAVE = 'orcamento-pintor-v1';
+  const TIPOS = [
+    { id: 'parede', nome: 'Parede', tinta: true },
+    { id: 'teto', nome: 'Teto', tinta: true },
+    { id: 'fachada', nome: 'Fachada', tinta: true },
+    { id: 'textura', nome: 'Textura / grafiato', tinta: false },
+    { id: 'massa', nome: 'Massa corrida', tinta: false },
+    { id: 'outro', nome: 'Outro', tinta: false }
+  ];
+  const nomeTipo = id => (TIPOS.find(t => t.id === id) || { nome: id }).nome;
+  let seq = 1;
+  const novoId = () => 'i' + (Date.now().toString(36)) + (seq++);
+
+  function exemplo() {
+    return {
+      exemplo: true,
+      pintor: { nome: '', tel: '' },
+      precos: { parede: '15', teto: '18', fachada: '25', textura: '30', massa: '12', outro: '' },
+      tinta: { rend: '10', demaos: '2', lata: '350', galao: '95' },
+      cliente: { nome: 'Ana (exemplo)', tel: '', local: 'Apartamento de 2 quartos' },
+      modo: 'm2',
+      itens: [
+        { id: novoId(), desc: 'Paredes da sala e quartos', tipo: 'parede', area: '120', preco: '15' },
+        { id: novoId(), desc: 'Tetos', tipo: 'teto', area: '45', preco: '18' },
+        { id: novoId(), desc: 'Massa corrida na sala', tipo: 'massa', area: '35', preco: '12' }
+      ],
+      dia: { dias: '3', pintores: '2', valor: '250', desc: '' },
+      fechado: { valor: '', desc: '' },
+      areaManual: '',
+      material: { incluir: true, extras: [
+        { id: novoId(), desc: 'Massa corrida (2 baldes)', valor: '160' },
+        { id: novoId(), desc: 'Lixas, fita crepe e lona', valor: '60' }
+      ] },
+      desconto: '', prazo: '5', validade: '15',
+      pagamento: '50% no início e 50% na entrega', obs: ''
+    };
+  }
+
+  let estado;
+  try {
+    const salvo = localStorage.getItem(CHAVE);
+    estado = salvo ? JSON.parse(salvo) : exemplo();
+  } catch (e) { estado = exemplo(); }
+  // completa campos que faltarem (versões antigas)
+  estado = Object.assign(exemplo(), estado);
+
+  function salvar() {
+    try { localStorage.setItem(CHAVE, JSON.stringify(estado)); } catch (e) {}
+  }
+
+  // ---------- utilidades ----------
+  const $ = id => document.getElementById(id);
+  const num = v => { const n = parseFloat(String(v ?? '').trim().replace(/\s/g, '').replace(',', '.')); return isFinite(n) ? n : 0; };
+  const brl = n => n.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+  const fmt = (n, d = 1) => n.toLocaleString('pt-BR', { maximumFractionDigits: d });
+  const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+  function getPath(p) { return p.split('.').reduce((o, k) => (o ? o[k] : undefined), estado); }
+  function confirmar(ancora, pergunta, textoSim, aoConfirmar) {
+    const ja = ancora.parentNode.querySelector(':scope > .confirma'); if (ja) ja.remove();
+    const box = document.createElement('div'); box.className = 'confirma'; box.setAttribute('role', 'alertdialog');
+    box.innerHTML = `<p>${esc(pergunta)}</p><div class="acoes"><button type="button" class="sim">${esc(textoSim)}</button><button type="button" class="btn-sec nao">Não, voltar</button></div>`;
+    ancora.hidden = true; ancora.after(box);
+    box.querySelector('.nao').addEventListener('click', ev => { ev.stopPropagation(); box.remove(); ancora.hidden = false; ancora.focus(); });
+    box.querySelector('.sim').addEventListener('click', ev => { ev.stopPropagation(); box.remove(); ancora.hidden = false; aoConfirmar(); });
+    box.querySelector('.nao').focus();
+  }
+  function setPath(p, v) { const ks = p.split('.'); let o = estado; ks.slice(0, -1).forEach(k => { o = o[k]; }); o[ks[ks.length - 1]] = v; }
+
+  // ---------- campos simples ----------
+  function preencher() {
+    document.querySelectorAll('[data-k]').forEach(el => {
+      const v = getPath(el.dataset.k);
+      if (el.type === 'checkbox') el.checked = !!v; else el.value = v ?? '';
+    });
+    document.querySelectorAll('[data-preco]').forEach(el => { el.value = estado.precos[el.dataset.preco] ?? ''; });
+    document.querySelectorAll('input[name="modo"]').forEach(r => { r.checked = r.value === estado.modo; });
+  }
+  document.querySelectorAll('[data-k]').forEach(el => {
+    el.addEventListener('input', () => {
+      setPath(el.dataset.k, el.type === 'checkbox' ? el.checked : el.value);
+      mudou();
+    });
+  });
+
+  // preços padrão
+  const gradePrecos = $('gradePrecos');
+  gradePrecos.innerHTML = TIPOS.filter(t => t.id !== 'outro').map(t =>
+    `<label for="preco_${t.id}">${t.nome} (R$/m²)<input id="preco_${t.id}" class="num" inputmode="decimal" data-preco="${t.id}" value="${esc(estado.precos[t.id])}"></label>`
+  ).join('');
+  gradePrecos.addEventListener('input', e => {
+    const id = e.target.dataset.preco; if (!id) return;
+    estado.precos[id] = e.target.value; mudou();
+  });
+
+  // ---------- modo de cobrança ----------
+  document.querySelectorAll('input[name="modo"]').forEach(r => {
+    r.addEventListener('change', () => { estado.modo = r.value; mostrarModo(); mudou(); });
+  });
+  function mostrarModo() {
+    $('blocoM2').hidden = estado.modo !== 'm2';
+    $('blocoDia').hidden = estado.modo !== 'dia';
+    $('blocoFechado').hidden = estado.modo !== 'fechado';
+    $('areaManualLbl').hidden = estado.modo === 'm2';
+  }
+
+  // ---------- serviços por m² ----------
+  function desenharItens() {
+    $('listaItens').innerHTML = estado.itens.map(it => `
+      <div class="item" data-id="${it.id}">
+        <label class="largo" for="d_${it.id}">Serviço<input id="d_${it.id}" data-f="desc" value="${esc(it.desc)}" placeholder="Ex.: Paredes da cozinha"></label>
+        <label for="t_${it.id}">Tipo<select id="t_${it.id}" data-f="tipo">${TIPOS.map(t => `<option value="${t.id}"${t.id === it.tipo ? ' selected' : ''}>${t.nome}</option>`).join('')}</select></label>
+        <label for="a_${it.id}">Área (m²)<input id="a_${it.id}" class="num" data-f="area" inputmode="decimal" value="${esc(it.area)}"></label>
+        <label for="p_${it.id}">R$ por m²<input id="p_${it.id}" class="num" data-f="preco" inputmode="decimal" value="${esc(it.preco)}"></label>
+        <div class="linha-total"><button class="btn-tirar" type="button" data-tirar="${it.id}">Remover</button><strong class="num" data-sub="${it.id}"></strong></div>
+      </div>`).join('');
+  }
+  $('listaItens').addEventListener('input', e => {
+    const box = e.target.closest('.item'); const f = e.target.dataset.f; if (!box || !f) return;
+    const it = estado.itens.find(i => i.id === box.dataset.id); if (!it) return;
+    if (f === 'tipo') {
+      const antigoPadrao = estado.precos[it.tipo] || '';
+      if (!it.preco || it.preco === antigoPadrao) {
+        it.preco = estado.precos[e.target.value] || '';
+        box.querySelector('[data-f="preco"]').value = it.preco;
+      }
+    }
+    it[f] = e.target.value; mudou();
+  });
+  $('listaItens').addEventListener('click', e => {
+    const id = e.target.dataset.tirar; if (!id) return;
+    estado.itens = estado.itens.filter(i => i.id !== id); desenharItens(); mudou();
+  });
+  $('addItem').addEventListener('click', () => {
+    const it = { id: novoId(), desc: '', tipo: 'parede', area: '', preco: estado.precos.parede || '' };
+    estado.itens.push(it); desenharItens(); mudou();
+    const campo = $('d_' + it.id); if (campo) campo.focus();
+  });
+
+  // ---------- outros materiais ----------
+  function desenharExtras() {
+    $('listaExtras').innerHTML = estado.material.extras.map(x => `
+      <div class="extra" data-id="${x.id}">
+        <label for="xd_${x.id}">Material<input id="xd_${x.id}" data-f="desc" value="${esc(x.desc)}"></label>
+        <label for="xv_${x.id}">R$<input id="xv_${x.id}" class="num" data-f="valor" inputmode="decimal" value="${esc(x.valor)}"></label>
+        <button class="btn-tirar" type="button" data-tirar="${x.id}" aria-label="Remover material">Remover</button>
+      </div>`).join('');
+  }
+  $('listaExtras').addEventListener('input', e => {
+    const box = e.target.closest('.extra'); const f = e.target.dataset.f; if (!box || !f) return;
+    const x = estado.material.extras.find(i => i.id === box.dataset.id); if (x) { x[f] = e.target.value; mudou(); }
+  });
+  $('listaExtras').addEventListener('click', e => {
+    const id = e.target.dataset.tirar; if (!id) return;
+    estado.material.extras = estado.material.extras.filter(i => i.id !== id); desenharExtras(); mudou();
+  });
+  $('addExtra').addEventListener('click', () => {
+    const x = { id: novoId(), desc: '', valor: '' };
+    estado.material.extras.push(x); desenharExtras(); mudou();
+    const campo = $('xd_' + x.id); if (campo) campo.focus();
+  });
+
+  // ---------- cálculos ----------
+  function calcular() {
+    let mao = 0, linhas = [];
+    if (estado.modo === 'm2') {
+      estado.itens.forEach(it => {
+        const sub = num(it.area) * num(it.preco); mao += sub;
+        if (num(it.area) > 0 || it.desc) linhas.push({ it, sub });
+      });
+    } else if (estado.modo === 'dia') {
+      mao = num(estado.dia.dias) * Math.max(1, num(estado.dia.pintores)) * num(estado.dia.valor);
+    } else {
+      mao = num(estado.fechado.valor);
+    }
+
+    const areaTinta = estado.modo === 'm2'
+      ? estado.itens.filter(it => (TIPOS.find(t => t.id === it.tipo) || {}).tinta).reduce((s, it) => s + num(it.area), 0)
+      : num(estado.areaManual);
+    const rend = num(estado.tinta.rend), dem = Math.max(1, num(estado.tinta.demaos) || 1);
+    const litros = rend > 0 ? areaTinta * dem / rend : 0;
+
+    let latas = Math.floor(litros / 18);
+    let galoes = Math.ceil(Math.max(0, litros - latas * 18 - 1e-9) / 3.6);
+    const pLata = num(estado.tinta.lata), pGalao = num(estado.tinta.galao);
+    if (galoes > 0 && pLata > 0 && galoes * pGalao >= pLata) { latas += 1; galoes = 0; }
+    const custoTinta = latas * pLata + galoes * pGalao;
+    const extras = estado.material.extras.reduce((s, x) => s + num(x.valor), 0);
+    const material = estado.material.incluir ? custoTinta + extras : 0;
+    const desconto = num(estado.desconto);
+    const total = Math.max(0, mao + material - desconto);
+    return { mao, linhas, areaTinta, litros, latas, galoes, custoTinta, extras, material, desconto, total };
+  }
+
+  function textoCompra(c) {
+    const p = [];
+    if (c.latas) p.push(`${c.latas} lata${c.latas > 1 ? 's' : ''} de 18 L`);
+    if (c.galoes) p.push(`${c.galoes} ${c.galoes > 1 ? 'galões' : 'galão'} de 3,6 L`);
+    return p.join(' + ') || '—';
+  }
+
+  function montarMensagem(c) {
+    const L = [];
+    L.push('*ORÇAMENTO DE PINTURA*');
+    L.push('Data: ' + new Date().toLocaleDateString('pt-BR'));
+    if (estado.pintor.nome) L.push('Pintor: ' + estado.pintor.nome + (estado.pintor.tel ? ' · ' + estado.pintor.tel : ''));
+    if (estado.cliente.nome) L.push('Cliente: ' + estado.cliente.nome);
+    if (estado.cliente.local) L.push('Local: ' + estado.cliente.local);
+    L.push('');
+    L.push('*Serviços*');
+    if (estado.modo === 'm2') {
+      c.linhas.forEach(({ it, sub }) => {
+        const nome = it.desc || nomeTipo(it.tipo);
+        L.push(`• ${nome} (${nomeTipo(it.tipo).toLowerCase()}): ${fmt(num(it.area))} m² × ${brl(num(it.preco))} = ${brl(sub)}`);
+      });
+    } else if (estado.modo === 'dia') {
+      if (estado.dia.desc) L.push(estado.dia.desc);
+      const pint = Math.max(1, num(estado.dia.pintores));
+      L.push(`• ${fmt(num(estado.dia.dias))} dia(s) × ${pint} pintor(es) × ${brl(num(estado.dia.valor))} por dia`);
+    } else {
+      if (estado.fechado.desc) L.push(estado.fechado.desc);
+      L.push('• Preço fechado pelo serviço completo');
+    }
+    L.push('*Mão de obra:* ' + brl(c.mao));
+    L.push('');
+    if (estado.material.incluir) {
+      L.push('*Material*');
+      if (c.custoTinta > 0) L.push(`• Tinta: ${textoCompra(c)} = ${brl(c.custoTinta)}`);
+      estado.material.extras.forEach(x => { if (x.desc || num(x.valor)) L.push(`• ${x.desc || 'Material'}: ${brl(num(x.valor))}`); });
+      L.push('*Material:* ' + brl(c.material));
+    } else {
+      L.push('*Material:* por conta do cliente');
+      if (c.litros > 0) L.push(`(Tinta estimada: cerca de ${fmt(c.litros)} litros — ${textoCompra(c)})`);
+    }
+    if (c.desconto > 0) L.push('*Desconto:* -' + brl(c.desconto));
+    L.push('');
+    L.push('*TOTAL: ' + brl(c.total) + '*');
+    L.push('');
+    if (num(estado.prazo)) L.push('Prazo: ' + fmt(num(estado.prazo), 0) + ' dia(s) de trabalho');
+    if (estado.pagamento) L.push('Pagamento: ' + estado.pagamento);
+    if (num(estado.validade)) L.push('Orçamento válido por ' + fmt(num(estado.validade), 0) + ' dias');
+    if (estado.obs) { L.push(''); L.push('Obs.: ' + estado.obs); }
+    return L.join('\n');
+  }
+
+  function telWa(t) {
+    let d = String(t || '').replace(/\D/g, '');
+    if (!d) return '';
+    if (d.length === 10 || d.length === 11) d = '55' + d;
+    return d;
+  }
+
+  function atualizar() {
+    const c = calcular();
+    estado.itens.forEach(it => {
+      const el = document.querySelector(`[data-sub="${it.id}"]`);
+      if (el) el.textContent = brl(num(it.area) * num(it.preco));
+    });
+    $('areaAutoDica').textContent = estado.modo === 'm2'
+      ? `Área de tinta: ${fmt(c.areaTinta)} m² (soma de paredes, tetos e fachadas).`
+      : '';
+    $('areaAutoDica').hidden = estado.modo !== 'm2';
+    $('cLitros').textContent = fmt(c.litros) + ' L';
+    $('cLatas').textContent = textoCompra(c);
+    $('cCustoTinta').textContent = brl(c.custoTinta);
+    $('blocoExtras').hidden = !estado.material.incluir;
+
+    $('rMao').textContent = brl(c.mao);
+    $('rMat').textContent = estado.material.incluir ? brl(c.material) : 'Por conta do cliente';
+    $('rDescLinha').hidden = !(c.desconto > 0);
+    $('rDesc').textContent = '-' + brl(c.desconto);
+    $('rTotal').textContent = brl(c.total);
+    $('barraTotal').textContent = brl(c.total);
+
+    const msg = montarMensagem(c);
+    $('mensagem').textContent = msg;
+    const tel = telWa(estado.cliente.tel);
+    $('btnWa').href = 'https://wa.me/' + tel + '?text=' + encodeURIComponent(msg);
+    $('btnWa').textContent = tel ? 'Enviar pro cliente no WhatsApp' : 'Abrir no WhatsApp';
+    $('avisoExemplo').hidden = !estado.exemplo;
+  }
+
+  function mudou() { salvar(); atualizar(); }
+
+  // ---------- copiar ----------
+  $('btnCopiar').addEventListener('click', () => {
+    const texto = $('mensagem').textContent, btn = $('btnCopiar');
+    const ok = () => { btn.textContent = 'Copiado'; setTimeout(() => { btn.textContent = 'Copiar mensagem'; }, 1800); };
+    const selecionar = () => {
+      const r = document.createRange(); r.selectNodeContents($('mensagem'));
+      const s = window.getSelection(); s.removeAllRanges(); s.addRange(r);
+      btn.textContent = 'Texto selecionado: copie';
+      setTimeout(() => { btn.textContent = 'Copiar mensagem'; }, 2500);
+    };
+    try {
+      navigator.clipboard.writeText(texto).then(ok, selecionar);
+    } catch (e) { selecionar(); }
+  });
+
+  // ---------- novo orçamento ----------
+  function novoOrcamento() {
+    const manter = { pintor: estado.pintor, precos: estado.precos, tinta: estado.tinta, pagamento: estado.pagamento, validade: estado.validade };
+    estado = Object.assign(exemplo(), manter, {
+      exemplo: false,
+      cliente: { nome: '', tel: '', local: '' },
+      itens: [{ id: novoId(), desc: '', tipo: 'parede', area: '', preco: manter.precos.parede || '' }],
+      dia: { dias: '', pintores: '1', valor: '', desc: '' },
+      fechado: { valor: '', desc: '' },
+      areaManual: '', desconto: '', prazo: '', obs: '',
+      material: { incluir: true, extras: [] }
+    });
+    salvar();
+    preencher(); desenharItens(); desenharExtras(); mostrarModo(); atualizar();
+    window.scrollTo(0, 0);
+  }
+  $('btnNovo').addEventListener('click', e => confirmar(e.currentTarget,
+    'Apagar este orçamento e começar um novo? Seus dados e preços continuam salvos.', 'Sim, começar novo', novoOrcamento));
+
+  // qualquer edição tira o aviso de exemplo
+  document.addEventListener('input', e => { if (estado.exemplo && e.target.closest && e.target.closest('#telaOrc')) { estado.exemplo = false; salvar(); $('avisoExemplo').hidden = true; } }, true);
+
+
+
+  // ================= FOTOS =================
+  let fotos = [];           // { id, obra, tipo, data, blob, url, exemplo }
+  let dbOk = true;
+  const BANCO = (() => {
+    let p;
+    function abrir() {
+      if (p) return p;
+      p = new Promise((res, rej) => {
+        try {
+          const r = indexedDB.open('pintor-fotos', 1);
+          r.onupgradeneeded = () => { r.result.createObjectStore('fotos', { keyPath: 'id' }); };
+          r.onsuccess = () => res(r.result);
+          r.onerror = () => rej(r.error);
+        } catch (e) { rej(e); }
+      });
+      return p;
+    }
+    function tx(modo, fn) {
+      return abrir().then(db => new Promise((res, rej) => {
+        const t = db.transaction('fotos', modo); const req = fn(t.objectStore('fotos'));
+        t.oncomplete = () => res(req ? req.result : undefined);
+        t.onerror = () => rej(t.error); t.onabort = () => rej(t.error);
+      }));
+    }
+    return {
+      todas: () => tx('readonly', st => st.getAll()),
+      salvar: f => tx('readwrite', st => st.put(f)),
+      apagar: id => tx('readwrite', st => st.delete(id))
+    };
+  })();
+
+  function reduzir(arquivo) {
+    return new Promise((res, rej) => {
+      const url = URL.createObjectURL(arquivo); const img = new Image();
+      img.onload = () => {
+        const max = 1280, k = Math.min(1, max / Math.max(img.naturalWidth, img.naturalHeight));
+        const w = Math.round(img.naturalWidth * k), h = Math.round(img.naturalHeight * k);
+        const cv = document.createElement('canvas'); cv.width = w; cv.height = h;
+        cv.getContext('2d').drawImage(img, 0, 0, w, h);
+        URL.revokeObjectURL(url);
+        cv.toBlob(b => b ? res(b) : rej(new Error('falhou')), 'image/jpeg', 0.8);
+      };
+      img.onerror = () => { URL.revokeObjectURL(url); rej(new Error('imagem inválida')); };
+      img.src = url;
+    });
+  }
+
+  function htmlFotos(obraId, comRemover, tipo) {
+    const lista = fotos.filter(f => f.obra === obraId && (!tipo || f.tipo === tipo));
+    if (!lista.length) return comRemover ? '<p class="dica">Nenhuma foto ainda.</p>' : '';
+    return `<div class="fotos">${lista.map(f => `
+      <figure class="foto">
+        <button type="button" class="ver" data-ver="${f.id}" aria-label="Ver foto ${f.tipo === 'antes' ? 'de antes' : 'de depois'}"><img src="${f.url}" alt="Foto ${f.tipo === 'antes' ? 'de antes' : 'de depois'}" loading="lazy"></button>
+        ${comRemover || !tipo ? `<figcaption class="${f.tipo}">${f.tipo === 'antes' ? 'Antes' : 'Depois'}</figcaption>` : ''}
+      </figure>`).join('')}</div>`;
+  }
+
+  function apagarFoto(id) {
+    const f = fotos.find(x => x.id === id); if (!f) return;
+    if (f.url) URL.revokeObjectURL(f.url);
+    fotos = fotos.filter(x => x.id !== id);
+    if (!f.exemplo && dbOk) BANCO.apagar(id).catch(() => {});
+  }
+
+  async function adicionarFotos(obra, tipo, arquivos) {
+    for (const arq of arquivos) {
+      try {
+        const blob = await reduzir(arq);
+        const f = { id: novoId(), obra: obra.id, tipo, data: hoje(), blob };
+        if (dbOk) { try { await BANCO.salvar(f); } catch (e) { dbOk = false; $('avisoSemDB').hidden = false; } }
+        f.url = URL.createObjectURL(blob);
+        fotos.push(f);
+      } catch (e) { /* imagem que não abriu é ignorada */ }
+    }
+    obra.aberta = true; obra.exemplo = false; salvarObras();
+    desenharObras(); desenharPortfolio();
+  }
+
+  function fotoExemplo(antes) {
+    const cv = document.createElement('canvas'); cv.width = 640; cv.height = 480;
+    const g = cv.getContext('2d');
+    g.fillStyle = antes ? '#b9b2a3' : '#4f8f9c'; g.fillRect(0, 0, 640, 480);
+    g.fillStyle = antes ? '#8d8676' : '#3f7b88'; g.fillRect(0, 380, 640, 100);
+    if (antes) {
+      let sem = 7; const r = () => { sem = (sem * 9301 + 49297) % 233280; return sem / 233280; };
+      for (let i = 0; i < 26; i++) {
+        g.fillStyle = `rgba(90, 80, 60, ${0.15 + r() * 0.25})`;
+        g.beginPath(); g.ellipse(r() * 640, r() * 380, 10 + r() * 50, 6 + r() * 30, r() * 3, 0, Math.PI * 2); g.fill();
+      }
+      g.strokeStyle = 'rgba(60,50,40,.5)'; g.lineWidth = 2;
+      g.beginPath(); g.moveTo(420, 40); g.lineTo(450, 120); g.lineTo(430, 190); g.lineTo(470, 280); g.stroke();
+    } else {
+      g.fillStyle = 'rgba(255,255,255,.08)'; g.fillRect(0, 0, 640, 40);
+    }
+    g.fillStyle = '#ffffff'; g.fillRect(250, 150, 140, 170);
+    g.fillStyle = antes ? '#6d6557' : '#2c5f6a'; g.fillRect(262, 162, 116, 146);
+    return new Promise(res => cv.toBlob(b => res(b), 'image/jpeg', 0.85));
+  }
+
+  async function carregarFotos() {
+    try {
+      const salvas = await BANCO.todas();
+      fotos = (salvas || []).map(f => Object.assign(f, { url: URL.createObjectURL(f.blob) }));
+    } catch (e) { dbOk = false; $('avisoSemDB').hidden = false; }
+    const ex = obras.find(o => o.exemplo);
+    if (ex && !fotos.length) {
+      for (const tipo of ['antes', 'depois']) {
+        const blob = await fotoExemplo(tipo === 'antes');
+        if (blob) fotos.push({ id: novoId(), obra: ex.id, tipo, data: hoje(), blob, url: URL.createObjectURL(blob), exemplo: true });
+      }
+    }
+    desenharObras(); desenharPortfolio();
+  }
+
+  function desenharPortfolio() {
+    const comFotos = obras.filter(o => fotos.some(f => f.obra === o.id));
+    $('avisoFotosEx').hidden = !fotos.some(f => f.exemplo);
+    $('listaPort').innerHTML = comFotos.length ? comFotos.map(o => {
+      const titulo = o.local || (o.cliente || '').replace(/\s*\(exemplo\)/, '') || 'Trabalho';
+      const a = htmlFotos(o.id, false, 'antes'), d = htmlFotos(o.id, false, 'depois');
+      return `<article class="port">
+        <h3>${esc(titulo)}</h3>
+        <div class="port-par">
+          <div class="port-col"><small>Antes</small>${a || '<p class="dica">Sem foto</p>'}</div>
+          <div class="port-col"><small>Depois</small>${d || '<p class="dica">Sem foto</p>'}</div>
+        </div>
+      </article>`;
+    }).join('') : '<p class="vazio">Ainda não há fotos. Abra uma obra na aba Obras e adicione fotos de antes e depois.</p>';
+  }
+
+  let fotoNoVisor = null;
+  function abrirVisor(id, podeApagar) {
+    const f = fotos.find(x => x.id === id); if (!f) return;
+    fotoNoVisor = f.id;
+    $('visorImg').src = f.url; $('visorImg').alt = f.tipo === 'antes' ? 'Foto de antes' : 'Foto de depois';
+    $('visorApagar').hidden = !podeApagar;
+    $('visor').hidden = false; $('visorFechar').focus();
+  }
+  function fecharVisor() {
+    const c = $('visor').querySelector('.confirma'); if (c) c.remove();
+    $('visorApagar').hidden = true; $('visor').hidden = true; $('visorImg').removeAttribute('src'); fotoNoVisor = null;
+  }
+  $('visor').addEventListener('click', e => { if (e.target === $('visor')) fecharVisor(); });
+  $('visorFechar').addEventListener('click', fecharVisor);
+  $('visorApagar').addEventListener('click', e => confirmar(e.currentTarget, 'Apagar esta foto?', 'Sim, apagar foto', () => {
+    const id = fotoNoVisor; fecharVisor(); apagarFoto(id); desenharObras(); desenharPortfolio();
+  }));
+  document.addEventListener('keydown', e => { if (e.key === 'Escape' && !$('visor').hidden) fecharVisor(); });
+  $('listaPort').addEventListener('click', e => { const v = e.target.closest('[data-ver]'); if (v) abrirVisor(v.dataset.ver, false); });
+
+  // ================= OBRAS E COBRANÇAS =================
+  const CHAVE_OBRAS = 'obras-pintor-v1';
+  const hoje = () => { const d = new Date(); return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); };
+  const dataBR = s => s ? s.split('-').reverse().join('/') : '';
+  const TIPOS_GASTO = { ajudante: 'Ajudante', material: 'Material', outro: 'Outro' };
+  function obrasExemplo() {
+    const m = hoje().slice(0, 8);
+    return [{ id: novoId(), exemplo: true, cliente: 'Carlos (exemplo)', tel: '', local: 'Casa: fachada e muro', valor: '4800', status: 'andamento', inicio: m + '01', aberta: false,
+      pagamentos: [{ id: novoId(), data: m + '01', valor: '2400', nota: 'Adiantamento de 50%' }],
+      gastos: [
+        { id: novoId(), data: m + '01', tipo: 'material', desc: 'Tinta e massa', valor: '900' },
+        { id: novoId(), data: m + '01', tipo: 'ajudante', desc: 'Ajudante, 3 dias', valor: '600' }
+      ] }];
+  }
+  let obras;
+  try { const s = localStorage.getItem(CHAVE_OBRAS); obras = s ? JSON.parse(s) : obrasExemplo(); } catch (e) { obras = obrasExemplo(); }
+  if (!Array.isArray(obras)) obras = obrasExemplo();
+  const salvarObras = () => { try { localStorage.setItem(CHAVE_OBRAS, JSON.stringify(obras)); } catch (e) {} };
+  const recebido = o => o.pagamentos.reduce((s, p) => s + num(p.valor), 0);
+  const gastoObra = o => o.gastos.reduce((s, g) => s + num(g.valor), 0);
+  const falta = o => Math.max(0, num(o.valor) - recebido(o));
+  const acharObra = id => obras.find(o => o.id === id);
+
+  function linhaMov(m, tipo) {
+    const texto = tipo === 'pag' ? (m.nota || 'Pagamento') : (TIPOS_GASTO[m.tipo] || 'Gasto') + (m.desc ? ' · ' + m.desc : '');
+    return `<div class="mov"><div class="mov-info"><span class="mov-txt">${esc(texto)}</span><span class="mov-data num">${dataBR(m.data)}</span></div><b class="num">${brl(num(m.valor))}</b><button type="button" class="btn-tirar" data-acao="tirar" data-lista="${tipo}" data-mid="${m.id}">Apagar</button></div>`;
+  }
+
+  function cartaoObra(o) {
+    const f = falta(o), rec = recebido(o), gas = gastoObra(o), val = num(o.valor);
+    const chip = o.status === 'concluida' ? (f > 0 ? ['Concluída, falta cobrar', 'alerta'] : ['Paga', 'ok']) : ['Em andamento', 'andamento'];
+    const nome = (o.cliente || '').replace(/\s*\(exemplo\)/, '');
+    const cobrar = `Olá${nome ? ' ' + nome : ''}, tudo bem? Passando para lembrar do valor que falta da pintura${o.local ? ' (' + o.local + ')' : ''}: ${brl(f)}. Qualquer dúvida estou à disposição. Obrigado!`;
+    const pct = val > 0 ? Math.min(100, rec / val * 100) : 0;
+    return `<details class="obra" data-obra="${o.id}"${o.aberta ? ' open' : ''}>
+      <summary>
+        <div class="obra-topo"><strong>${esc(o.cliente || 'Obra sem nome')}</strong><span class="chip ${chip[1]}">${chip[0]}</span></div>
+        ${o.local ? `<div class="obra-sub">${esc(o.local)}</div>` : ''}
+        <div class="barra-pago" aria-hidden="true"><i style="width:${pct}%"></i></div>
+        <div class="obra-nums num"><span>Recebido ${brl(rec)} de ${brl(val)}</span><strong>${f > 0 ? 'Falta ' + brl(f) : 'Quitado'}</strong></div>
+        <span class="obra-abrir">Toque para abrir ▾</span>
+      </summary>
+      <div class="obra-corpo">
+        <div class="grade">
+          <label for="oc_${o.id}">Cliente<input id="oc_${o.id}" data-of="cliente" value="${esc(o.cliente)}"></label>
+          <label for="ot_${o.id}">WhatsApp do cliente<input id="ot_${o.id}" data-of="tel" inputmode="tel" value="${esc(o.tel)}"></label>
+          <label for="ol_${o.id}">Local<input id="ol_${o.id}" data-of="local" value="${esc(o.local)}"></label>
+          <label for="ov_${o.id}">Valor combinado (R$)<input id="ov_${o.id}" data-of="valor" class="num" inputmode="decimal" value="${esc(o.valor)}"></label>
+          <label for="os_${o.id}">Situação<select id="os_${o.id}" data-of="status"><option value="andamento"${o.status === 'andamento' ? ' selected' : ''}>Em andamento</option><option value="concluida"${o.status === 'concluida' ? ' selected' : ''}>Concluída</option></select></label>
+        </div>
+
+        <h3>Pagamentos recebidos</h3>
+        <div>${o.pagamentos.map(p => linhaMov(p, 'pag')).join('') || '<p class="dica">Nenhum pagamento ainda.</p>'}</div>
+        <div class="form-mov" data-form="pag">
+          <label for="pd_${o.id}">Data<input id="pd_${o.id}" type="date" data-n="data" value="${hoje()}"></label>
+          <label for="pv_${o.id}">Valor (R$)<input id="pv_${o.id}" data-n="valor" class="num" inputmode="decimal" placeholder="${f > 0 ? fmt(f, 2) : ''}"></label>
+          <label class="largo" for="pn_${o.id}">Nota<input id="pn_${o.id}" data-n="nota" placeholder="Ex.: adiantamento, final"></label>
+          <button type="button" class="btn-add" data-acao="addPag">Registrar pagamento</button>
+        </div>
+
+        <h3>Gastos da obra</h3>
+        <div>${o.gastos.map(g => linhaMov(g, 'gas')).join('') || '<p class="dica">Nenhum gasto ainda.</p>'}</div>
+        <div class="form-mov" data-form="gas">
+          <label for="gd_${o.id}">Data<input id="gd_${o.id}" type="date" data-n="data" value="${hoje()}"></label>
+          <label for="gt_${o.id}">Tipo<select id="gt_${o.id}" data-n="tipo"><option value="ajudante">Ajudante</option><option value="material">Material</option><option value="outro">Outro</option></select></label>
+          <label for="gv_${o.id}">Valor (R$)<input id="gv_${o.id}" data-n="valor" class="num" inputmode="decimal"></label>
+          <label class="largo" for="gn_${o.id}">Descrição<input id="gn_${o.id}" data-n="desc" placeholder="Ex.: Pedro, 2 dias"></label>
+          <button type="button" class="btn-add" data-acao="addGas">Registrar gasto</button>
+        </div>
+
+        <h3>Fotos</h3>
+        ${htmlFotos(o.id, true)}
+        <div class="botoes-foto">
+          <label class="btn-add btn-foto">+ Foto de antes<input class="vh" type="file" accept="image/*" multiple data-foto="antes"></label>
+          <label class="btn-add btn-foto">+ Foto de depois<input class="vh" type="file" accept="image/*" multiple data-foto="depois"></label>
+        </div>
+
+        <div class="obra-resumo num">
+          <div><span>Recebido</span><b>${brl(rec)}</b></div>
+          <div><span>Gastos</span><b>${brl(gas)}</b></div>
+          <div><span>Sobra até agora</span><b>${brl(rec - gas)}</b></div>
+        </div>
+        <div class="acoes">
+          ${f > 0 ? `<a class="btn-wa" href="https://wa.me/${telWa(o.tel)}?text=${encodeURIComponent(cobrar)}" target="_blank" rel="noopener">Cobrar pelo WhatsApp</a>` : ''}
+          <button type="button" class="btn-sec perigo" data-acao="apagar">Apagar obra</button>
+        </div>
+      </div>
+    </details>`;
+  }
+
+  function desenharObras() {
+    const mes = hoje().slice(0, 7);
+    const doMes = lista => lista.filter(x => (x.data || '').slice(0, 7) === mes).reduce((a, x) => a + num(x.valor), 0);
+    const recMes = obras.reduce((s, o) => s + doMes(o.pagamentos), 0);
+    const gasMes = obras.reduce((s, o) => s + doMes(o.gastos), 0);
+    $('sAReceber').textContent = brl(obras.reduce((s, o) => s + falta(o), 0));
+    $('sRecMes').textContent = brl(recMes);
+    $('sGasMes').textContent = brl(gasMes);
+    $('sSobra').textContent = brl(recMes - gasMes);
+    $('avisoObrasEx').hidden = !obras.some(o => o.exemplo);
+    const ordem = [...obras].sort((a, b) => {
+      const pa = a.status === 'andamento' ? 0 : (falta(a) > 0 ? 1 : 2);
+      const pb = b.status === 'andamento' ? 0 : (falta(b) > 0 ? 1 : 2);
+      return pa - pb;
+    });
+    $('listaObras').innerHTML = ordem.length ? ordem.map(cartaoObra).join('')
+      : '<p class="vazio">Nenhuma obra ainda. Toque em "Nova obra" ou salve um orçamento aprovado como obra.</p>';
+  }
+
+  function adicionarObra(dados) {
+    obras = obras.filter(o => !o.exemplo);
+    fotos = fotos.filter(f => !f.exemplo);
+    const o = Object.assign({ id: novoId(), cliente: '', tel: '', local: '', valor: '', status: 'andamento', inicio: hoje(), aberta: true, pagamentos: [], gastos: [] }, dados);
+    obras.unshift(o); salvarObras(); desenharObras(); desenharPortfolio();
+    return o;
+  }
+
+  const lista = $('listaObras');
+  lista.addEventListener('toggle', e => {
+    const o = acharObra(e.target.dataset && e.target.dataset.obra);
+    if (o) { o.aberta = e.target.open; salvarObras(); }
+  }, true);
+  lista.addEventListener('input', e => {
+    const campo = e.target.dataset.of; if (!campo) return;
+    const o = acharObra(e.target.closest('.obra').dataset.obra); if (!o) return;
+    o[campo] = e.target.value; o.exemplo = false; salvarObras();
+  });
+  lista.addEventListener('change', e => {
+    if (e.target.dataset.foto) {
+      const o = acharObra(e.target.closest('.obra').dataset.obra);
+      const arquivos = Array.from(e.target.files || []);
+      if (o && arquivos.length) adicionarFotos(o, e.target.dataset.foto, arquivos);
+      return;
+    }
+    const campo = e.target.dataset.of;
+    if (campo === 'valor' || campo === 'status' || campo === 'cliente' || campo === 'local' || campo === 'tel') desenharObras();
+  });
+  lista.addEventListener('click', e => {
+    const ver = e.target.closest('[data-ver]');
+    if (ver) { abrirVisor(ver.dataset.ver, true); return; }
+    const btn = e.target.closest('[data-acao]'); if (!btn) return;
+    const box = btn.closest('.obra'); const o = box && acharObra(box.dataset.obra); if (!o) return;
+    const acao = btn.dataset.acao;
+    if (acao === 'addPag' || acao === 'addGas') {
+      const form = btn.closest('.form-mov');
+      const ler = n => { const el = form.querySelector(`[data-n="${n}"]`); return el ? el.value : ''; };
+      const valorEl = form.querySelector('[data-n="valor"]');
+      if (!(num(ler('valor')) > 0)) {
+        valorEl.classList.add('erro'); valorEl.focus();
+        if (!form.querySelector('.msg-erro')) form.insertAdjacentHTML('beforeend', '<p class="msg-erro">Escreva o valor antes de registrar.</p>');
+        return;
+      }
+      const mov = { id: novoId(), data: ler('data') || hoje(), valor: ler('valor') };
+      if (acao === 'addPag') { mov.nota = ler('nota'); o.pagamentos.push(mov); }
+      else { mov.tipo = ler('tipo'); mov.desc = ler('desc'); o.gastos.push(mov); }
+      o.exemplo = false; o.aberta = true; salvarObras(); desenharObras();
+    } else if (acao === 'tirar') {
+      const k = btn.dataset.lista === 'pag' ? 'pagamentos' : 'gastos';
+      confirmar(btn, btn.dataset.lista === 'pag' ? 'Apagar este pagamento?' : 'Apagar este gasto?', 'Sim, apagar', () => {
+        o[k] = o[k].filter(m => m.id !== btn.dataset.mid); salvarObras(); desenharObras();
+      });
+    } else if (acao === 'apagar') {
+      confirmar(btn, 'Apagar esta obra, com pagamentos, gastos e fotos? Depois não dá para recuperar.', 'Sim, apagar obra', () => {
+        fotos.filter(f => f.obra === o.id).forEach(f => apagarFoto(f.id));
+        obras = obras.filter(x => x.id !== o.id); salvarObras(); desenharObras(); desenharPortfolio();
+      });
+    }
+  });
+  lista.addEventListener('input', e => {
+    if (e.target.classList.contains('erro')) {
+      e.target.classList.remove('erro');
+      const m = e.target.closest('.form-mov') && e.target.closest('.form-mov').querySelector('.msg-erro'); if (m) m.remove();
+    }
+  });
+
+  $('btnNovaObra').addEventListener('click', () => {
+    const o = adicionarObra({});
+    const campo = $('oc_' + o.id); if (campo) campo.focus();
+  });
+
+  $('btnSalvarObra').addEventListener('click', () => {
+    const c = calcular();
+    adicionarObra({
+      cliente: estado.cliente.nome, tel: estado.cliente.tel, local: estado.cliente.local,
+      valor: c.total ? c.total.toFixed(2) : ''
+    });
+    mostrarAba('obras');
+    window.scrollTo(0, 0);
+  });
+
+  // ---------- abas ----------
+  let abaAtual = 'orc';
+  function mostrarAba(qual) {
+    if (!['orc', 'obras', 'port'].includes(qual)) qual = 'orc';
+    abaAtual = qual;
+    $('telaOrc').hidden = qual !== 'orc';
+    $('telaObras').hidden = qual !== 'obras';
+    $('telaPort').hidden = qual !== 'port';
+    $('barraTotalBox').hidden = qual !== 'orc';
+    $('abaOrc').setAttribute('aria-selected', String(qual === 'orc'));
+    $('abaObras').setAttribute('aria-selected', String(qual === 'obras'));
+    $('abaPort').setAttribute('aria-selected', String(qual === 'port'));
+    try { localStorage.setItem('pintor-aba', qual); } catch (e) {}
+  }
+  $('abaOrc').addEventListener('click', () => mostrarAba('orc'));
+  $('abaObras').addEventListener('click', () => mostrarAba('obras'));
+  $('abaPort').addEventListener('click', () => mostrarAba('port'));
+  let abaInicial = 'orc';
+  try { abaInicial = localStorage.getItem('pintor-aba') || 'orc'; } catch (e) {}
+  if (location.hash === '#obras') abaInicial = 'obras';
+  if (location.hash === '#portfolio') abaInicial = 'port';
+  desenharObras();
+  desenharPortfolio();
+  carregarFotos();
+  mostrarAba(abaInicial);
+
+
+  // ================= CALCULADORA PARA TODOS =================
+  const CHAVE_CASA = 'casa-pintor-v1';
+  const PORTA_M2 = 1.7, JANELA_M2 = 1.5;
+  function casaExemplo() {
+    return {
+      modo: 'medir', m2Paredes: '', m2Teto: '',
+      estimados: [{ id: novoId(), tam: 'q9', teto: true }],
+      demaos: '2', rend: '10', lata: '', galao: '',
+      comodos: [
+        { id: novoId(), nome: 'Sala', c: '4', l: '3,5', h: '2,7', portas: '1', janelas: '1', teto: true },
+        { id: novoId(), nome: 'Quarto', c: '3', l: '3', h: '2,7', portas: '1', janelas: '1', teto: true }
+      ]
+    };
+  }
+  let casa;
+  try { const s = localStorage.getItem(CHAVE_CASA); casa = s ? JSON.parse(s) : casaExemplo(); } catch (e) { casa = casaExemplo(); }
+  casa = Object.assign(casaExemplo(), casa);
+  const salvarCasa = () => { try { localStorage.setItem(CHAVE_CASA, JSON.stringify(casa)); } catch (e) {} };
+
+  function areasComodo(k) {
+    const c = num(k.c), l = num(k.l), h = num(k.h);
+    const paredes = Math.max(0, 2 * (c + l) * h - num(k.portas) * PORTA_M2 - num(k.janelas) * JANELA_M2);
+    const teto = k.teto ? c * l : 0;
+    return { paredes, teto };
+  }
+  function compra(litros, pLata, pGalao) {
+    let latas = Math.floor(litros / 18);
+    let galoes = Math.ceil(Math.max(0, litros - latas * 18 - 1e-9) / 3.6);
+    if (galoes > 0 && pLata > 0 && galoes * pGalao >= pLata) { latas += 1; galoes = 0; }
+    if (galoes >= 5) { latas += 1; galoes = 0; }
+    return { latas, galoes, custo: latas * pLata + galoes * pGalao };
+  }
+
+  function desenharComodos() {
+    $('listaComodos').innerHTML = casa.comodos.map(k => `
+      <div class="comodo" data-id="${k.id}">
+        <label class="largo" for="kn_${k.id}">Nome do cômodo<input id="kn_${k.id}" data-k2="nome" value="${esc(k.nome)}" placeholder="Ex.: Cozinha"></label>
+        <label for="kc_${k.id}">Comprimento (m)<input id="kc_${k.id}" class="num" data-k2="c" inputmode="decimal" value="${esc(k.c)}"></label>
+        <label for="kl_${k.id}">Largura (m)<input id="kl_${k.id}" class="num" data-k2="l" inputmode="decimal" value="${esc(k.l)}"></label>
+        <label for="kh_${k.id}">Altura (m)<input id="kh_${k.id}" class="num" data-k2="h" inputmode="decimal" value="${esc(k.h)}"></label>
+        <label for="kp_${k.id}">Portas<input id="kp_${k.id}" class="num" data-k2="portas" inputmode="numeric" value="${esc(k.portas)}"></label>
+        <label for="kj_${k.id}">Janelas<input id="kj_${k.id}" class="num" data-k2="janelas" inputmode="numeric" value="${esc(k.janelas)}"></label>
+        <label class="check largo" for="kt_${k.id}"><input type="checkbox" id="kt_${k.id}" data-k2="teto"${k.teto ? ' checked' : ''}>Pintar o teto também</label>
+        <div class="linha-total"><span data-ka="${k.id}"></span><button class="btn-tirar" type="button" data-tirarc="${k.id}">Remover</button></div>
+      </div>`).join('');
+  }
+  $('listaComodos').addEventListener('input', e => {
+    const box = e.target.closest('.comodo'); const f = e.target.dataset.k2; if (!box || !f) return;
+    const k = casa.comodos.find(x => x.id === box.dataset.id); if (!k) return;
+    k[f] = e.target.type === 'checkbox' ? e.target.checked : e.target.value;
+    salvarCasa(); atualizarCasa();
+  });
+  $('listaComodos').addEventListener('click', e => {
+    const id = e.target.dataset.tirarc; if (!id) return;
+    casa.comodos = casa.comodos.filter(x => x.id !== id); salvarCasa(); desenharComodos(); atualizarCasa();
+  });
+  $('addComodo').addEventListener('click', () => {
+    const k = { id: novoId(), nome: '', c: '', l: '', h: '2,7', portas: '1', janelas: '1', teto: true };
+    casa.comodos.push(k); salvarCasa(); desenharComodos(); atualizarCasa();
+    const campo = $('kn_' + k.id); if (campo) campo.focus();
+  });
+  document.querySelectorAll('[data-c]').forEach(el => {
+    el.value = casa[el.dataset.c] ?? '';
+    el.addEventListener('input', () => { casa[el.dataset.c] = el.value; salvarCasa(); atualizarCasa(); });
+  });
+
+
+  const TAMANHOS = [
+    { id: 'b4', nome: 'Banheiro ou lavanderia (uns 4 m² de chão)', area: 4 },
+    { id: 'q9', nome: 'Quarto pequeno (uns 9 m²)', area: 9 },
+    { id: 'q12', nome: 'Quarto médio ou cozinha (uns 12 m²)', area: 12 },
+    { id: 's20', nome: 'Sala ou quarto grande (uns 20 m²)', area: 20 },
+    { id: 's30', nome: 'Sala grande (uns 30 m²)', area: 30 }
+  ];
+  function areasEstimado(e) {
+    const t = TAMANHOS.find(x => x.id === e.tam) || TAMANHOS[1];
+    const lado = Math.sqrt(t.area);
+    const paredes = Math.max(0, 4 * lado * 2.7 - PORTA_M2 - JANELA_M2);
+    return { paredes, teto: e.teto ? t.area : 0 };
+  }
+  function desenharEstimados() {
+    $('listaEstimados').innerHTML = casa.estimados.map(e => `
+      <div class="estimado" data-id="${e.id}">
+        <label for="et_${e.id}">Tamanho do cômodo<select id="et_${e.id}" data-e="tam">${TAMANHOS.map(t => `<option value="${t.id}"${t.id === e.tam ? ' selected' : ''}>${t.nome}</option>`).join('')}</select></label>
+        <label class="check" for="ec_${e.id}"><input type="checkbox" id="ec_${e.id}" data-e="teto"${e.teto ? ' checked' : ''}>Pintar o teto também</label>
+        <div class="linha-total"><span data-ea="${e.id}"></span><button class="btn-tirar" type="button" data-tirare="${e.id}">Remover</button></div>
+      </div>`).join('');
+  }
+  $('listaEstimados').addEventListener('input', ev => {
+    const box = ev.target.closest('.estimado'); const f = ev.target.dataset.e; if (!box || !f) return;
+    const e = casa.estimados.find(x => x.id === box.dataset.id); if (!e) return;
+    e[f] = ev.target.type === 'checkbox' ? ev.target.checked : ev.target.value;
+    salvarCasa(); atualizarCasa();
+  });
+  $('listaEstimados').addEventListener('change', ev => { if (ev.target.dataset.e === 'tam') { const box = ev.target.closest('.estimado'); const e = casa.estimados.find(x => x.id === box.dataset.id); if (e) { e.tam = ev.target.value; salvarCasa(); atualizarCasa(); } } });
+  $('listaEstimados').addEventListener('click', ev => {
+    const id = ev.target.dataset.tirare; if (!id) return;
+    casa.estimados = casa.estimados.filter(x => x.id !== id); salvarCasa(); desenharEstimados(); atualizarCasa();
+  });
+  $('addEstimado').addEventListener('click', () => {
+    casa.estimados.push({ id: novoId(), tam: 'q9', teto: true }); salvarCasa(); desenharEstimados(); atualizarCasa();
+  });
+  document.querySelectorAll('input[name="casaModo"]').forEach(r => {
+    r.addEventListener('change', () => { casa.modo = r.value; salvarCasa(); mostrarModoCasa(); atualizarCasa(); });
+  });
+  function mostrarModoCasa() {
+    document.querySelectorAll('input[name="casaModo"]').forEach(r => { r.checked = r.value === casa.modo; });
+    $('blocoMedir').hidden = casa.modo !== 'medir';
+    $('blocoM2Casa').hidden = casa.modo !== 'm2';
+    $('blocoEstimar').hidden = casa.modo !== 'estimar';
+  }
+
+  const LINK_APP = document.querySelector('link[rel="manifest"]') ? (location.origin + location.pathname) : '';
+  function montarLista(r) {
+    const L = ['*Lista de compras: pintura*', ''];
+    const aprox = casa.modo === 'estimar' ? ' (aproximado)' : '';
+    if (r.paredes > 0) L.push(`Paredes: ${fmt(r.paredes)} m²${aprox}`);
+    if (r.teto > 0) L.push(`Teto: ${fmt(r.teto)} m²${aprox}`);
+    L.push(`Demãos: ${fmt(r.dem, 0)}`);
+    L.push('');
+    if (r.lp > 0) L.push(`• Tinta para paredes: ${textoCompra(r.cp)} (cerca de ${fmt(r.lp)} L)`);
+    if (r.lt > 0) L.push(`• Tinta para teto: ${textoCompra(r.ct)} (cerca de ${fmt(r.lt)} L)`);
+    L.push('• Rolo de lã e bandeja');
+    L.push('• Pincel para cantos e recortes');
+    L.push('• Fita crepe');
+    L.push('• Lona ou papelão para proteger o chão');
+    L.push('• Lixa para parede');
+    if (r.custo > 0) { L.push(''); L.push(`Custo estimado da tinta: ${brl(r.custo)}`); }
+    if (LINK_APP) { L.push(''); L.push('Calculado no Orçamento do Pintor: ' + LINK_APP); }
+    return L.join('\n');
+  }
+  $('btnCopiarLista').addEventListener('click', () => {
+    const btn = $('btnCopiarLista'), pre = $('listaComprasTxt');
+    const ok = () => { btn.textContent = 'Copiado'; setTimeout(() => { btn.textContent = 'Copiar lista'; }, 1800); };
+    const selecionar = () => {
+      const rg = document.createRange(); rg.selectNodeContents(pre);
+      const sel = window.getSelection(); sel.removeAllRanges(); sel.addRange(rg);
+      btn.textContent = 'Texto selecionado: copie'; setTimeout(() => { btn.textContent = 'Copiar lista'; }, 2500);
+    };
+    try { navigator.clipboard.writeText(pre.textContent).then(ok, selecionar); } catch (e) { selecionar(); }
+  });
+
+  function atualizarCasa() {
+    let paredes = 0, teto = 0;
+    casa.comodos.forEach(k => {
+      const a = areasComodo(k);
+      if (casa.modo === 'medir') { paredes += a.paredes; teto += a.teto; }
+      const el = document.querySelector(`[data-ka="${k.id}"]`);
+      if (el) el.textContent = `Paredes ${fmt(a.paredes)} m²` + (k.teto ? ` · Teto ${fmt(a.teto)} m²` : '');
+    });
+    casa.estimados.forEach(e => {
+      const a = areasEstimado(e);
+      if (casa.modo === 'estimar') { paredes += a.paredes; teto += a.teto; }
+      const el = document.querySelector(`[data-ea="${e.id}"]`);
+      if (el) el.textContent = `Paredes uns ${fmt(a.paredes, 0)} m²` + (e.teto ? ` · Teto ${fmt(a.teto, 0)} m²` : '');
+    });
+    if (casa.modo === 'm2') { paredes = num(casa.m2Paredes); teto = num(casa.m2Teto); }
+    const dem = Math.max(1, num(casa.demaos) || 1), rend = num(casa.rend) || 10;
+    const pLata = num(casa.lata), pGalao = num(casa.galao);
+    const lp = paredes * dem / rend, lt = teto * dem / rend;
+    const cp = compra(lp, pLata, pGalao), ct = compra(lt, pLata, pGalao);
+    $('rcParedes').textContent = fmt(paredes) + ' m²';
+    $('rcTeto').textContent = fmt(teto) + ' m²';
+    $('rcTintaParede').textContent = lp > 0 ? `${fmt(lp)} L · ${textoCompra(cp)}` : '—';
+    $('rcTintaTeto').textContent = lt > 0 ? `${fmt(lt)} L · ${textoCompra(ct)}` : '—';
+    $('rcTetoLinha').hidden = !(teto > 0);
+    const temPreco = pLata > 0 || pGalao > 0;
+    $('rcCustoLinha').hidden = !temPreco;
+    $('rcCusto').textContent = brl(cp.custo + ct.custo);
+    $('rcNota').textContent = casa.modo === 'medir'
+      ? 'Portas e janelas já foram descontadas. Para o teto, use tinta própria para teto. Na dúvida, compre um pouco a mais.'
+      : casa.modo === 'estimar'
+        ? 'Cálculo aproximado, considerando pé-direito de 2,70 m, uma porta e uma janela por cômodo. Compre um pouco a mais.'
+        : 'Para o teto, use tinta própria para teto. Na dúvida, compre um pouco a mais.';
+    const texto = montarLista({ paredes, teto, dem, lp, lt, cp, ct, custo: temPreco ? cp.custo + ct.custo : 0 });
+    $('listaComprasTxt').textContent = texto;
+    $('btnWaLista').href = 'https://wa.me/?text=' + encodeURIComponent(texto);
+  }
+
+  // ================= TELAS =================
+  function mostrarTela(t) {
+    if (!['inicio', 'casa', 'pintor'].includes(t)) t = 'inicio';
+    $('telaInicio').hidden = t !== 'inicio';
+    $('telaCasa').hidden = t !== 'casa';
+    $('telaPintor').hidden = t !== 'pintor';
+    $('btnInicio').hidden = t === 'inicio';
+    if (t === 'pintor') mostrarAba(abaAtual); else $('barraTotalBox').hidden = true;
+    try { localStorage.setItem('pintor-tela', t); } catch (e) {}
+  }
+  $('escCasa').addEventListener('click', () => { mostrarTela('casa'); window.scrollTo(0, 0); });
+  $('escPintor').addEventListener('click', () => { mostrarTela('pintor'); window.scrollTo(0, 0); });
+  $('btnInicio').addEventListener('click', () => { mostrarTela('inicio'); window.scrollTo(0, 0); });
+
+
+  // ---------- instalar no celular ----------
+  const jaInstalado = () => {
+    try { return window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true; } catch (e) { return false; }
+  };
+  const ehIphone = /iphone|ipad|ipod/i.test(navigator.userAgent);
+  let pedidoInstalar = null;
+  window.addEventListener('beforeinstallprompt', e => { e.preventDefault(); pedidoInstalar = e; });
+  window.addEventListener('appinstalled', () => { pedidoInstalar = null; mostrarInstalar(); });
+  function mostrarInstalar() {
+    const mostrar = !jaInstalado();
+    $('cardInstalar').hidden = !mostrar;
+    $('btnInstalarTopo').hidden = !mostrar;
+  }
+  function abrirPainelInstalar() {
+    $('instAndroid').hidden = ehIphone;
+    $('instIphone').hidden = false;
+    if (ehIphone) $('instIphone').parentNode.insertBefore($('instIphone'), $('instAndroid'));
+    $('painelInstalar').hidden = false;
+    $('fecharInstalar').focus();
+  }
+  async function instalar() {
+    if (pedidoInstalar) {
+      const p = pedidoInstalar; pedidoInstalar = null;
+      try { p.prompt(); await p.userChoice; } catch (e) { abrirPainelInstalar(); }
+      mostrarInstalar();
+    } else {
+      abrirPainelInstalar();
+    }
+  }
+  $('btnInstalar').addEventListener('click', instalar);
+  $('btnInstalarTopo').addEventListener('click', instalar);
+  $('fecharInstalar').addEventListener('click', () => { $('painelInstalar').hidden = true; });
+  $('painelInstalar').addEventListener('click', e => { if (e.target === $('painelInstalar')) $('painelInstalar').hidden = true; });
+  document.addEventListener('keydown', e => { if (e.key === 'Escape' && !$('painelInstalar').hidden) $('painelInstalar').hidden = true; });
+  mostrarInstalar();
+
+  // ---------- letra grande ----------
+  function aplicarLetra(g) {
+    document.documentElement.classList.toggle('grande', g);
+    $('btnLetra').setAttribute('aria-pressed', String(g));
+    $('btnLetra').textContent = g ? 'A− Letra normal' : 'A+ Letra grande';
+  }
+  let letraGrande = false;
+  try { letraGrande = localStorage.getItem('pintor-letra') === '1'; } catch (e) {}
+  aplicarLetra(letraGrande);
+  $('btnLetra').addEventListener('click', () => {
+    letraGrande = !letraGrande; aplicarLetra(letraGrande);
+    try { localStorage.setItem('pintor-letra', letraGrande ? '1' : '0'); } catch (e) {}
+  });
+
+  preencher(); desenharItens(); desenharExtras(); mostrarModo(); atualizar();
+  desenharComodos(); desenharEstimados(); mostrarModoCasa(); atualizarCasa();
+  let telaInicial = 'inicio';
+  try { telaInicial = localStorage.getItem('pintor-tela') || 'inicio'; } catch (e) {}
+  if (location.hash === '#casa') telaInicial = 'casa';
+  if (['#pintor', '#obras', '#portfolio'].includes(location.hash)) telaInicial = 'pintor';
+  mostrarTela(telaInicial);
+})();
+</script>
+
+<script>
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => { navigator.serviceWorker.register('sw.js').catch(() => {}); });
+  }
+</script>
+</body>
+</html>
